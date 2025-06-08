@@ -20,6 +20,7 @@ class User extends Authenticatable
         'password',
         'role',  // agregá role aquí
         'es_admin', // si usás este booleano también
+        'celular',
     ];
 
     protected $hidden = [
