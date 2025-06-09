@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Spa Sentirse Bien') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -13,11 +13,26 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Styles -->
+     <style>
+    body {
+        background-image: url('https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        }
+
+    </style>
+
 </head>
-<body class="font-sans antialiased bg-white">
+<body class="font-sans antialiased text-gray-900">
+
+    {{-- 🔽 Aquí va tu navbar superior --}}
 
     {{-- 🔽 Aquí va tu navbar superior responsivo --}}
-    <nav x-data="{ open: false }" class="text-white shadow-md" style="background-color: #f9a8d4;">
+    <nav x-data="{ open: false }" class="text-white shadow-md" style="background-color: #fbb6ce;">
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -51,7 +66,7 @@
 
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
+                                {{ __('Mi Perfil') }}
                             </x-dropdown-link>
 
                             <!-- Authentication -->
@@ -112,10 +127,11 @@
     </nav>
 
     {{-- 🔽 Acá comienza tu layout actual con Sidebar --}}
-    <div class="flex min-h-screen">
+    <div class="flex min-h-screen bg-white/80 backdrop-blur-sm rounded-xl shadow-xl">
+
 
         <!-- Sidebar -->
-        <aside class="w-58 text-oscuro shadow-lg flex flex-col" style="background-color: #fce7f3;">
+        <aside class="w-48 text-oscuro shadow-lg flex flex-col" style="background-color:hsl(339, 82.60%, 86.50%);">
             <div class="p-6 flex justify-center">
                 <a href="{{ route('home') }}" class="transform transition-transform duration-500 hover:scale-105">
                     <img src="/imagenes/logo.png" alt="Logo Sentirse Bien" class="h-24 w-auto animate-fade-in">
@@ -125,7 +141,7 @@
             <nav class="mt-4 space-y-2 text-ms"> {{-- text-base o text-lg para letra más grande --}}
                
             @if (Auth::user()->isAdmin())
-                        <x-nav-link :href="route('admin.servicios.index')" class="flex items-center gap-2">
+                    <x-nav-link :href="route('admin.servicios.index')" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-pink-200 text-pink-900 hover:bg-pink-300 hover:text-white transition-all duration-300">
                         <x-lucide-settings class="w-5 h-5" />
                         Gestionar Servicios
                     </x-nav-link>
