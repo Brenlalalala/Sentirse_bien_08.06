@@ -131,76 +131,73 @@
 
 
         <!-- Sidebar -->
-        <aside class="w-48 text-oscuro shadow-lg flex flex-col" style="background-color:hsl(339, 82.60%, 86.50%);">
+        <aside class="w-48 text-oscuro shadow-lg flex flex-col" style="background-color: #fce7f3;">
             <div class="p-6 flex justify-center">
                 <a href="{{ route('home') }}" class="transform transition-transform duration-500 hover:scale-105">
                     <img src="/imagenes/logo.png" alt="Logo Sentirse Bien" class="h-24 w-auto animate-fade-in">
                 </a>
             </div>
 
-            <nav class="mt-4 space-y-2 text-ms"> {{-- text-base o text-lg para letra más grande --}}
-               
-            @if (Auth::user()->isAdmin())
-                    <x-nav-link :href="route('admin.servicios.index')" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-pink-200 text-pink-900 hover:bg-pink-300 hover:text-white transition-all duration-300">
+            <nav class="mt-6 space-y-2 text-ms">
+                @if (Auth::user()->isAdmin())
+                    <x-button-link :href="route('admin.servicios.index')" :active="request()->routeIs('admin.servicios.index')">
                         <x-lucide-settings class="w-5 h-5" />
                         Gestionar Servicios
-                    </x-nav-link>
+                    </x-button-link>
 
-                    <x-nav-link :href="route('admin.turnos.index')" class="flex items-center gap-2">
-                            <x-lucide-calendar-days class="w-5 h-5" />
-                            Gestionar Turnos
-                        </x-nav-link>
+                    <x-button-link :href="route('admin.turnos.index')" :active="request()->routeIs('admin.turnos.index')">
+                        <x-lucide-calendar-days class="w-5 h-5" />
+                        Gestionar Turnos
+                    </x-button-link>
 
-                    <x-nav-link :href="route('admin.usuarios.index')" class="flex items-center gap-2">
+                    <x-button-link :href="route('admin.usuarios.index')" :active="request()->routeIs('admin.usuarios.index')">
                         <x-lucide-users class="w-5 h-5" />
                         Gestionar Usuarios
-                    </x-nav-link>
-                    
-                    <x-nav-link :href="route('admin.turnos.dia')" class="flex items-center gap-2">
+                    </x-button-link>
+
+                    <x-button-link :href="route('admin.turnos.dia')" :active="request()->routeIs('admin.turnos.dia')">
                         <x-lucide-calendar-check class="w-5 h-5" />
                         Ver Turnos por Día
-                    </x-nav-link>
+                    </x-button-link>
 
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                    <x-button-link href="#">
                         <x-lucide-history class="w-5 h-5" />
                         Ver historial de clientes
-                    </x-nav-link>
+                    </x-button-link>
 
                 @elseif (Auth::user()->isProfesional())
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                    <x-button-link href="#">
                         <x-lucide-calendar-check class="w-5 h-5" />
                         Turnos del Día
-                    </x-nav-link>
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                    </x-button-link>
+                    <x-button-link href="#">
                         <x-lucide-history class="w-5 h-5" />
                         Historial Clientes
-                    </x-nav-link>
-                @elseif (Auth::user()->hasRole('cliente'))
+                    </x-button-link>
 
-                    <x-nav-link  :href="route('cliente.reservar-turno')"  class="flex items-center gap-2">
+                @elseif (Auth::user()->hasRole('cliente'))
+                    <x-button-link :href="route('cliente.reservar-turno')" :active="request()->routeIs('cliente.reservar-turno')">
                         <x-lucide-calendar-plus class="w-5 h-5" />
                         Reservar Turno
-                    </x-nav-link>
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                    </x-button-link>
+                    <x-button-link href="#">
                         <x-lucide-heart class="w-5 h-5" />
                         Mis Servicios
-                    </x-nav-link>
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                    </x-button-link>
+                    <x-button-link href="#">
                         <x-lucide-history class="w-5 h-5" />
                         Historial
-                    </x-nav-link>
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                    </x-button-link>
+                    <x-button-link href="#">
                         <x-lucide-user class="w-5 h-5" />
                         Mi Perfil
-                    </x-nav-link>
+                    </x-button-link>
                 @endif
             </nav>
-
 
             <div class="mt-auto p-4 text-center text-gray-500">
                 <p class="text-sm">© {{ date('Y') }} Sentirse Bien. Todos los derechos reservados.</p>
             </div>
-
 
         </aside>
 
