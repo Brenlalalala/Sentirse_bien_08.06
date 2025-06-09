@@ -40,10 +40,10 @@ class User extends Authenticatable
         return $this->es_admin == true || $this->role === 'admin';
     }
 
-    public function isCliente()
-    {
-        return $this->role === 'cliente';
-    }
+   public function isCliente()
+{
+    return $this->hasRole('cliente');
+}
 
     public function isProfesional()
     {

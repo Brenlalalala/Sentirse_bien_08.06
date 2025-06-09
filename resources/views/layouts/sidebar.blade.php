@@ -159,8 +159,9 @@
                         <x-lucide-history class="w-5 h-5" />
                         Historial Clientes
                     </x-nav-link>
-                @elseif (Auth::user()->isCliente())
-                    <x-nav-link href="#" class="flex items-center gap-2">
+                @elseif (Auth::user()->hasRole('cliente'))
+
+                    <x-nav-link  :href="route('cliente.reservar-turno')"  class="flex items-center gap-2">
                         <x-lucide-calendar-plus class="w-5 h-5" />
                         Reservar Turno
                     </x-nav-link>
