@@ -19,7 +19,7 @@ Route::get('/servicios', [ServiciosController::class, 'index'])->name('servicios
 Route::get('/servicios/{servicio}', [ServiciosController::class, 'show'])->name('servicios.show');
 Route::get('/contacto', fn() => view('contacto'))->name('contacto');
 Route::post('/contacto', [ContactoController::class, 'enviar'])->name('contacto.enviar');
-Route::post('/reservar', [ReservaController::class, 'store'])->name('reservar');
+Route::middleware('auth')->post('/reservar', [ReservaController::class, 'store'])->name('reservar');
 
 // Perfil del cliente (ruta pública si querés, o con auth según necesidad)
 Route::get('/cliente/perfil', [ClienteController::class, 'perfil'])->name('cliente.perfil');

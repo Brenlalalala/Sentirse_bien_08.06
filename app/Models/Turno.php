@@ -9,11 +9,11 @@ class Turno extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['cliente_id', 'servicio_id', 'fecha', 'hora', 'estado'];
+    protected $fillable = ['user_id', 'servicio_id', 'fecha', 'hora', 'estado'];
 
-   public function cliente()
+   public function user()
 {
-    return $this->belongsTo(User::class, 'cliente_id');
+    return $this->belongsTo(User::class, 'user_id');
 }
 
 

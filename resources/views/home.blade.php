@@ -159,14 +159,52 @@
             animation: float-up-down 2s ease-in-out infinite;
         }
         
+        @keyframes vibrar-suave {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+        }
+
+        .boton-vibrador {
+            animation: vibrar-suave 0.5s ease-in-out infinite;
+            animation-delay: 0s;
+            animation-iteration-count: infinite;
+            animation-play-state: running;
+        }
+
+        /* Solo lo hace vibrar cada 5s */
+        @keyframes intermitente {
+            0%, 95% {
+                animation-play-state: paused;
+            }
+            96%, 100% {
+                animation-play-state: running;
+            }
+        }
+
 
     </style>
 </head>
 
 <!-- Botón flotante -->
-<button id="boton-chat" onclick="toggleChat()" style="position:fixed; bottom:20px; right:20px; background:#ec4899; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:24px; box-shadow:0 0 10px rgba(0,0,0,0.3); z-index:9999;">
-    💬
-</button>
+<!-- Botón flotante con mensaje -->
+<div id="boton-chat-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display: flex; align-items: center; gap: 10px;">
+
+    <!-- Mensaje de ayuda -->
+    <span id="mensaje-ayuda" style="background:#fff0f5; color:#ec4899; padding:8px 12px; border-radius:20px; font-weight:500; font-size:14px; box-shadow:0 0 5px rgba(0,0,0,0.1);">
+        ¿Necesitás ayuda?
+    </span>
+
+    <!-- Botón flotante -->
+    <button id="boton-chat" onclick="toggleChat()"
+        style="background:#ec4899; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:28px; box-shadow:0 0 10px rgba(0,0,0,0.3); cursor:pointer;"
+        class="vibrar">
+        🤖
+    </button>
+</div>
+
 
     <!-- Ventana del chatbot -->
     <div id="chatbot" style="display:none; position:fixed; bottom:90px; right:20px; width:300px; background:white; border:1px solid #ccc; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:9999;">
@@ -191,6 +229,8 @@
             </button>
         </div>
     </div>
+
+    <audio id="sonido-notificacion" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
 
 
 <body class="font-sans">
@@ -725,6 +765,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+                setInterval(() => {
+            const boton = document.getElementById('boton-chat');
+            boton.classList.add('boton-vibrador');
+
+            setTimeout(() => {
+                boton.classList.remove('boton-vibrador');
+            }, 800); // Duración de la vibración
+        }, 3000); // Repite cada 3 segundos
+
+        //Boton flotante del chatbot
+            setTimeout(() => {
+        const mensaje = document.getElementById('mensaje-ayuda');
+        if (mensaje) mensaje.style.display = 'none';
+        }, 30000); // se oculta después de 30 segundos
 
 </script>
 

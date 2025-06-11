@@ -62,10 +62,18 @@
                                     <span class="block text-lg font-bold text-pink-500 mt-auto">
                                         ${{ number_format($servicio->precio, 0, ',', '.') }} ARS
                                     </span>
-                                    <button onclick="abrirModalDia('{{ $servicio->nombre }}')"
-                                        class="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition">
-                                        Reservar
-                                    </button>
+                                    @auth
+                                        <button onclick="abrirModalDia('{{ $servicio->nombre }}')"
+                                            class="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition">
+                                            Reservar
+                                        </button>
+                                    @else
+                                        <a href="{{ route('login') }}"
+                                            class="mt-4 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition block text-center">
+                                            Inicia sesión para reservar
+                                        </a>
+                                    @endauth
+
 
 
                                 @endif
@@ -130,24 +138,26 @@
     </div>
     {{-- MODAL: Datos del cliente --}}  
     <!-- Modal: Datos del cliente -->
-    <form id="modal-datos" method="POST" action="{{ route('reservar') }}" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
-        @csrf
-        <input type="hidden" name="servicio" id="input-servicio">
-        <input type="hidden" name="fecha" id="input-fecha">
-        <input type="hidden" name="hora" id="input-hora">
+<form id="modal-datos" method="POST" action="{{ route('reservar') }}" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
+    @csrf
+    <input type="hidden" name="servicio_id" id="input-servicio">
+    <input type="hidden" name="fecha" id="input-fecha">
+    <input type="hidden" name="hora" id="input-hora">
 
-        <div class="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 class="text-xl font-bold mb-4">Tus datos</h2>
-            <input type="text" name="nombre" placeholder="Nombre completo" required class="w-full border p-2 mb-2 rounded">
-            <input type="email" name="email" placeholder="Correo electrónico" required class="w-full border p-2 mb-2 rounded">
-            <input type="text" name="telefono" placeholder="Teléfono (opcional)" class="w-full border p-2 mb-4 rounded">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-bold mb-4">Confirmá tu turno</h2>
+        <p id="servicio-nombre" class="text-pink-500 font-semibold mb-4"></p>
 
-            <div class="flex justify-between">
-                <button type="button" onclick="document.getElementById('modal-datos').classList.add('hidden')" class="bg-gray-400 px-4 py-2 rounded text-white">Cancelar</button>
-                <button type="submit" class="bg-pink-500 px-4 py-2 rounded text-white">Reservar</button>
-            </div>
+        <p class="mb-2"><strong>Nombre:</strong> {{ auth()->user()->name }}</p>
+        <p class="mb-2"><strong>Email:</strong> {{ auth()->user()->email }}</p>
+
+        <div class="flex justify-between mt-6">
+            <button type="button" onclick="document.getElementById('modal-datos').classList.add('hidden')" class="bg-gray-400 px-4 py-2 rounded text-white">Cancelar</button>
+            <button type="submit" class="bg-pink-500 px-4 py-2 rounded text-white">Reservar</button>
         </div>
-    </form>
+    </div>
+</form>
+
 
 
          {{-- Script MODAL CALENDARIO --}}

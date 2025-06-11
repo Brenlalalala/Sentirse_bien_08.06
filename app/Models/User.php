@@ -49,6 +49,12 @@ class User extends Authenticatable
     {
         return $this->role === 'profesional';
     }
+
+    public function turnos() {
+    return $this->hasMany(Turno::class);
+}
+
+
 }
 
 
