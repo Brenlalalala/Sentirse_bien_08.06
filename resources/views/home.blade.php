@@ -158,7 +158,7 @@
         .floating {
             animation: float-up-down 2s ease-in-out infinite;
         }
-        
+                
         @keyframes vibrar-suave {
             0%, 100% { transform: translate(0); }
             20% { transform: translateX(-2px); }
@@ -183,8 +183,6 @@
                 animation-play-state: running;
             }
         }
-
-
     </style>
 </head>
 
@@ -199,10 +197,15 @@
 
     <!-- Botón flotante -->
     <button id="boton-chat" onclick="toggleChat()"
-        style="background:#ec4899; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:28px; box-shadow:0 0 10px rgba(0,0,0,0.3); cursor:pointer;"
+        style="background:#ec4899; border:none; border-radius:50%; width:70px; height:70px; box-shadow:0 0 10px rgba(0,0,0,0.3); cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center;"
         class="vibrar">
-        🤖
+
+        <img src="{{ asset('imagenes/iconochatbot.png') }}" width="32" height="32">
+
+        <span id="punto-notificacion" style="display:none; position:absolute; top:8px; right:8px; background:red; width:12px; height:12px; border-radius:50%; z-index:10000;"></span>
     </button>
+
+
 </div>
 
 
@@ -718,69 +721,85 @@ document.addEventListener('DOMContentLoaded', function () {
     observadorEncabezado.observe(seccion2);
 });
 
-    //Chatbot
-    function toggleChat() {
+        //Chatbot
+        function toggleChat() {
             const chat = document.getElementById('chatbot');
-            const boton = document.getElementById('boton-chat');
+            const container = document.getElementById('boton-chat-container');
+            const noti = document.getElementById('punto-notificacion');
 
-            if (chat.style.display === 'none') {
-                chat.style.display = 'block';
-            } else {
+            const abierto = chat.style.display === 'block';
+
+            if (abierto) {
                 chat.style.display = 'none';
+                container.style.display = 'flex'; // Mostrar botón y mensaje
+            } else {
+                chat.style.display = 'block';
+                container.style.display = 'none'; // Ocultar ambos
+                noti.style.display = 'none'; // Limpiar notificación
             }
         }
 
-    function enviarMensaje() {
-            const entrada = document.getElementById('entrada');
-            const mensaje = entrada.value.trim();
-            if (mensaje === '') return;
+        function enviarMensaje() {
+        const entrada = document.getElementById('entrada');
+        const mensaje = entrada.value.trim();
+        if (mensaje === '') return;
 
-            const mensajesDiv = document.getElementById('mensajes');
-            mensajesDiv.innerHTML += `<div><strong>Tú:</strong> ${mensaje}</div>`;
+        const mensajesDiv = document.getElementById('mensajes');
+        mensajesDiv.innerHTML += `<div><strong>Tú:</strong> ${mensaje}</div>`;
 
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            // Enviar el mensaje al servidor
-            fetch('/chatbot', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ mensaje })
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log('Respuesta del servidor:', data); // 👈 Agregá esta línea
-                mensajesDiv.innerHTML += `<div><strong>Bot:</strong> ${data.respuesta}</div>`;
-                mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
-            });
+        fetch('/chatbot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ mensaje })
+        })
+        .then(res => res.json())
+        .then(data => {
+            mensajesDiv.innerHTML += `<div><strong>Bot:</strong> ${data.respuesta}</div>`;
+            mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
 
-            entrada.value = '';
+            const chatAbierto = document.getElementById('chatbot').style.display === 'block';
+            if (!chatAbierto) {
+                document.getElementById('punto-notificacion').style.display = 'block';
+                document.getElementById('sonido-notificacion').play();
+            }
+        });
+
+        entrada.value = '';
+    }
+
+    // Función para mostrar/ocultar la contraseña
+    function togglePassword(inputId, toggleButton) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            toggleButton.textContent = '🙈'; // Cambia el ícono a "ojo cerrado"
+        } else {
+            input.type = 'password';
+            toggleButton.textContent = '👁️'; // Cambia el ícono a "ojo abierto"
         }
+    }
+
+        // Detectar Enter en el campo de entrada del chatbot
     function detectarEnter(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); // Evita el comportamiento predeterminado del Enter
                 enviarMensaje();
             }
         }
-
-                setInterval(() => {
+        
+        setInterval(() => {
+            const chatAbierto = document.getElementById('chatbot').style.display === 'block';
             const boton = document.getElementById('boton-chat');
-            boton.classList.add('boton-vibrador');
-
-            setTimeout(() => {
-                boton.classList.remove('boton-vibrador');
-            }, 800); // Duración de la vibración
-        }, 3000); // Repite cada 3 segundos
-
-        //Boton flotante del chatbot
-            setTimeout(() => {
-        const mensaje = document.getElementById('mensaje-ayuda');
-        if (mensaje) mensaje.style.display = 'none';
-        }, 30000); // se oculta después de 30 segundos
-
-</script>
+            if (!chatAbierto) {
+                boton.classList.add('boton-vibrador');
+                setTimeout(() => boton.classList.remove('boton-vibrador'), 500);
+            }
+        }, 2000); // cada 2 segundos
+    </script>
 
 
 <div id="scrollTopBtn" class="fixed bottom-5 right-5 cursor-pointer z-50 fade-out" title="Volver arriba">

@@ -29,6 +29,7 @@ class ChatbotController extends Controller
 
         // Confirmación para ver listado de servicios
         if (
+            str_contains($mensaje, 'si') ||
             str_contains($mensaje, 'sí quiero') ||
             str_contains($mensaje, 'si quiero') ||
             str_contains($mensaje, 'ver listado') ||
@@ -67,6 +68,12 @@ class ChatbotController extends Controller
         if (str_contains($mensaje, 'contacto') || str_contains($mensaje, 'email')) {
             return response()->json(['respuesta' => 'Podés contactarnos al 362-1234567 o a info@sentirsebien.com']);
         }
+        if (str_contains($mensaje, 'whatsapp') || str_contains($mensaje, 'email')) {
+            return response()->json(['respuesta' => 'Podés contactarnos al 362-1234567 o a info@sentirsebien.com']);
+        }
+        if (str_contains($mensaje, 'numero') || str_contains($mensaje, 'email')) {
+            return response()->json(['respuesta' => 'Podés contactarnos al 362-1234567 o a info@sentirsebien.com']);
+        }
 
         // Despedida
         if (str_contains($mensaje, 'gracias')) {
@@ -83,12 +90,12 @@ class ChatbotController extends Controller
         }
 
         // Ubicación
-        if (str_contains($mensaje, 'ubicación') || str_contains($mensaje, 'dirección')) {
-            return response()->json(['respuesta' => 'Estamos ubicados en Av. Siempre Viva 1234, Ciudad.']);
+        if (str_contains($mensaje, 'ubicacion') || str_contains($mensaje, 'dirección')) {
+            return response()->json(['respuesta' => 'Estamos ubicados en French 414, Ciudad de Resistencia.']);
         }
 
         // Duración de los tratamientos
-        if (str_contains($mensaje, 'duración') || str_contains($mensaje, 'cuánto dura')) {
+        if (str_contains($mensaje, 'duracion') || str_contains($mensaje, 'cuánto dura')) {
             return response()->json(['respuesta' => 'La duración de los tratamientos depende del tipo, pero en promedio duran entre 30 y 60 minutos.']);
         }
 
