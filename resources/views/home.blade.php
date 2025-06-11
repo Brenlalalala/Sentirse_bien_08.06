@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentirse bien - Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         html, body {
             margin: 0;
@@ -161,6 +162,36 @@
 
     </style>
 </head>
+
+<!-- Botón flotante -->
+<button id="boton-chat" onclick="toggleChat()" style="position:fixed; bottom:20px; right:20px; background:#ec4899; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:24px; box-shadow:0 0 10px rgba(0,0,0,0.3); z-index:9999;">
+    💬
+</button>
+
+    <!-- Ventana del chatbot -->
+    <div id="chatbot" style="display:none; position:fixed; bottom:90px; right:20px; width:300px; background:white; border:1px solid #ccc; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:9999;">
+    <div class="bg-pink-500 border border-white rounded-t-xl p-3 flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-2">
+            <span class="text-xl">🌼</span>
+            <span class="font-semibold text-white text-sm sm:text-base">Asistente Sentirse Bien</span>
+        </div>
+        <button onclick="toggleChat()" class="text-white hover:text-gray-200 transition text-lg font-bold">
+            ✖
+        </button>
+    </div>
+
+        <div id="mensajes" style="height:200px; overflow-y:auto; padding:10px; font-size:14px;"></div>
+        <div style="display:flex; border-top:1px solid #eee;">
+        <input type="text" id="entrada" placeholder="Escribe tu mensaje..." style="flex:1; border:none; padding:8px;" onkeypress="detectarEnter(event)">
+            <button
+                onclick="enviarMensaje()"
+                style="background:#ec4899; color:white; border:none; padding:8px 16px; border-radius:9999px; font-family:inherit; font-weight:500;"
+            >
+                Enviar
+            </button>
+        </div>
+    </div>
+
 
 <body class="font-sans">
 
@@ -646,6 +677,54 @@ document.addEventListener('DOMContentLoaded', function () {
     // Comienza a observar la sección 2
     observadorEncabezado.observe(seccion2);
 });
+
+    //Chatbot
+    function toggleChat() {
+            const chat = document.getElementById('chatbot');
+            const boton = document.getElementById('boton-chat');
+
+            if (chat.style.display === 'none') {
+                chat.style.display = 'block';
+            } else {
+                chat.style.display = 'none';
+            }
+        }
+
+    function enviarMensaje() {
+            const entrada = document.getElementById('entrada');
+            const mensaje = entrada.value.trim();
+            if (mensaje === '') return;
+
+            const mensajesDiv = document.getElementById('mensajes');
+            mensajesDiv.innerHTML += `<div><strong>Tú:</strong> ${mensaje}</div>`;
+
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            // Enviar el mensaje al servidor
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ mensaje })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Respuesta del servidor:', data); // 👈 Agregá esta línea
+                mensajesDiv.innerHTML += `<div><strong>Bot:</strong> ${data.respuesta}</div>`;
+                mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+            });
+
+            entrada.value = '';
+        }
+    function detectarEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Evita el comportamiento predeterminado del Enter
+                enviarMensaje();
+            }
+        }
+
 
 </script>
 

@@ -10,6 +10,7 @@ use App\Http\Controllers\ClienteTurnoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TurnosPorDiaController;
+use App\Http\Controllers\ChatbotController;
 
 // Rutas públicas
 Route::get('/', fn() => view('home'))->name('home');
@@ -60,5 +61,8 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente/reservar-turno', [ClienteTurnoController::class, 'create'])->name('cliente.reservar-turno');
     Route::post('/cliente/reservar-turno', [ClienteTurnoController::class, 'store'])->name('cliente.reservar-turno.store');
 });
+
+//chatbot
+Route::post('/chatbot', [ChatbotController::class, 'responder']);
 
 require __DIR__.'/auth.php';
