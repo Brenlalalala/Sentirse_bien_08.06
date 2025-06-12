@@ -69,7 +69,7 @@
                                         </button>
                                     @else
                                         <a href="{{ route('login') }}"
-                                            class="mt-4 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition block text-center">
+                                            class="mt-4 bg-pink-400 text-white px-4 py-2 rounded hover:bg-pink-600 transition block text-center">
                                             Inicia sesión para reservar
                                         </a>
                                     @endauth
@@ -148,8 +148,12 @@
         <h2 class="text-xl font-bold mb-4">Confirmá tu turno</h2>
         <p id="servicio-nombre" class="text-pink-500 font-semibold mb-4"></p>
 
-        <p class="mb-2"><strong>Nombre:</strong> {{ auth()->user()->name }}</p>
-        <p class="mb-2"><strong>Email:</strong> {{ auth()->user()->email }}</p>
+        @if(auth()->check())
+            <p class="mb-2"><strong>Nombre:</strong> {{ auth()->user()->name }}</p>
+            <p class="mb-2"><strong>Email:</strong> {{ auth()->user()->email }}</p>
+        @else
+            <p class="text-red-500">Iniciá sesión para confirmar tu turno.</p>
+        @endif
 
         <div class="flex justify-between mt-6">
             <button type="button" onclick="document.getElementById('modal-datos').classList.add('hidden')" class="bg-gray-400 px-4 py-2 rounded text-white">Cancelar</button>
