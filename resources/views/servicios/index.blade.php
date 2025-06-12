@@ -166,51 +166,115 @@
 
          {{-- Script MODAL CALENDARIO --}}
     <!-- Modal fecha → Modal hora → Modal cliente -->
-    <script>
-    let servicioSeleccionado = '';
-    let fechaSeleccionada = '';
-    let horaSeleccionada = '';
+   <script>
+let servicioSeleccionado = '';
+let fechaSeleccionada = '';
+let horaSeleccionada = '';
 
-    function abrirModalDia(servicio) {
-        servicioSeleccionado = servicio;
-        document.getElementById('modal-dia').classList.remove('hidden');
+function abrirModalDia(servicio) {
+    servicioSeleccionado = servicio;
+
+    const inputFecha = document.getElementById('fecha-seleccionada');
+
+//     // Deshabilitar domingos
+// inputFecha.addEventListener('input', function () {
+//     const fecha = new Date(this.value);
+//     if (fecha.getDay() === 0) {
+//         alert('No se pueden reservar servicios los domingos.');
+//         this.value = ''; // Limpiar selección
+//     }
+//});
+
+
+    // Establecer fecha mínima (48 hs desde ahora)
+    const ahora = new Date();
+    ahora.setDate(ahora.getDate() + 2);
+    const anio = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dia = String(ahora.getDate()).padStart(2, '0');
+    const fechaMinima = `${anio}-${mes}-${dia}`;
+    inputFecha.min = fechaMinima;
+
+    inputFecha.value = ''; // Limpiar campo al abrir modal
+
+    document.getElementById('modal-dia').classList.remove('hidden');
+}
+
+document.getElementById('cancelar-dia').addEventListener('click', () => {
+    document.getElementById('modal-dia').classList.add('hidden');
+});
+
+document.getElementById('confirmar-dia').addEventListener('click', () => {
+    const fecha = document.getElementById('fecha-seleccionada').value;
+    if (!fecha) return alert('Seleccioná una fecha');
+
+    const fechaSeleccionadaDate = new Date(fecha);
+
+    // ❌ Validar si es domingo (getDay() === 0)
+    if (fechaSeleccionadaDate.getDay() === 0) {
+        alert('No se pueden reservar servicios los días domingo.');
+        return;
     }
 
-    document.getElementById('cancelar-dia').addEventListener('click', () => {
-        document.getElementById('modal-dia').classList.add('hidden');
+    // ❌ Validar que falten al menos 48 horas
+    const ahora = new Date();
+  // Establecer hora en 00:00 para comparar solo fechas
+    fechaSeleccionadaDate.setHours(0, 0, 0, 0);
+    ahora.setHours(0, 0, 0, 0);
+
+    const diferenciaMs = fechaSeleccionadaDate - ahora;
+    const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+
+    if (diferenciaHoras < 48) {
+        alert('Solo se pueden reservar servicios con al menos 48 horas de anticipación.');
+        return;
+    }
+
+    fechaSeleccionada = fecha;
+    const horarios = ['10:00', '12:00', '14:00', '16:00'];
+
+    const contenedor = document.getElementById('horarios-disponibles');
+    contenedor.innerHTML = '';
+
+    horarios.forEach(hora => {
+        const btn = document.createElement('button');
+        btn.textContent = hora;
+        btn.className = 'bg-pink-500 text-white px-4 py-2 rounded mb-2 w-full';
+        btn.onclick = () => {
+            horaSeleccionada = hora;
+
+            document.getElementById('input-servicio').value = servicioSeleccionado;
+            document.getElementById('input-fecha').value = fechaSeleccionada;
+            document.getElementById('input-hora').value = horaSeleccionada;
+
+            document.getElementById('modal-horario').classList.add('hidden');
+            document.getElementById('modal-datos').classList.remove('hidden');
+        };
+        contenedor.appendChild(btn);
     });
 
-    document.getElementById('confirmar-dia').addEventListener('click', () => {
-        const fecha = document.getElementById('fecha-seleccionada').value;
-        if (!fecha) return alert('Seleccioná una fecha');
+    document.getElementById('modal-dia').classList.add('hidden');
+    document.getElementById('modal-horario').classList.remove('hidden');
 
-        fechaSeleccionada = fecha;
-        const horarios = ['10:00', '12:00', '14:00', '16:00'];
 
-        const contenedor = document.getElementById('horarios-disponibles');
-        contenedor.innerHTML = '';
+    //para los días domingos
+document.addEventListener('DOMContentLoaded', function () {
+    const inputFecha = document.getElementById('fecha-seleccionada');
 
-        horarios.forEach(hora => {
-            const btn = document.createElement('button');
-            btn.textContent = hora;
-            btn.className = 'bg-pink-500 text-white px-4 py-2 rounded mb-2 w-full';
-            btn.onclick = () => {
-                horaSeleccionada = hora;
-
-                document.getElementById('input-servicio').value = servicioSeleccionado;
-                document.getElementById('input-fecha').value = fechaSeleccionada;
-                document.getElementById('input-hora').value = horaSeleccionada;
-
-                document.getElementById('modal-horario').classList.add('hidden');
-                document.getElementById('modal-datos').classList.remove('hidden');
-            };
-            contenedor.appendChild(btn);
-        });
-
-        document.getElementById('modal-dia').classList.add('hidden');
-        document.getElementById('modal-horario').classList.remove('hidden');
+    inputFecha.addEventListener('input', function () {
+        const fecha = new Date(this.value);
+        if (fecha.getDay() === 0) {
+            alert('No se pueden reservar servicios los domingos.');
+            this.value = ''; // Limpiar selección
+        }
     });
-    </script>
+});
+
+
+});
+</script>
+
+
 
 @if(session('success'))
     <div id="toast-success"

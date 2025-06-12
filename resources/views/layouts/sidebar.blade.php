@@ -176,7 +176,7 @@
                     </x-button-link>
 
                 @elseif (Auth::user()->hasRole('cliente'))
-                    <x-button-link :href="route('cliente.reservar-turno')" :active="request()->routeIs('cliente.reservar-turno')">
+                    <x-button-link :href="route('cliente.servicios.index')" :active="request()->routeIs('cliente.reservar-turno')">
                         <x-lucide-calendar-plus class="w-5 h-5" />
                         Reservar Turno
                     </x-button-link>

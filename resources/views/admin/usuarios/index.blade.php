@@ -4,6 +4,26 @@
 <div class="max-w-6xl mx-auto p-6 bg-white shadow rounded">
     <h2 class="text-2xl font-bold text-pink-600 mb-6">Gestión de Usuarios</h2>
 
+    @section('content')
+<div class="max-w-4xl mx-auto p-6 bg-white shadow rounded">
+    <h2 class="text-2xl font-bold text-pink-600 mb-6">Editar Usuario</h2>
+
+    @if(session('success'))
+        <div id="mensaje-exito" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+            {{ session('success') }}
+        </div>
+
+        <script>
+            setTimeout(function() {
+                var mensaje = document.getElementById('mensaje-exito');
+                if (mensaje) {
+                    mensaje.style.display = 'none';
+                }
+            }, 3000);
+        </script>
+    @endif
+
+
     <a href="{{ route('admin.usuarios.create') }}" class="bg-green-500 text-white px-4 py-2 rounded mb-4 inline-block hover:bg-green-600">➕ Crear nuevo usuario</a>
 
     <table class="w-full table-auto border-collapse">

@@ -1,6 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if(session('success'))
+    <div id="mensaje-exito" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        {{ session('success') }}
+    </div>
+
+    <script>
+        // Espera 3 segundos (3000 ms) y luego oculta el mensaje
+        setTimeout(function() {
+            var mensaje = document.getElementById('mensaje-exito');
+            if (mensaje) {
+                mensaje.style.display = 'none';
+            }
+        }, 3000);
+    </script>
+@endif
+
+
+
 <div class="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-3xl font-extrabold text-pink-700 mb-8 border-b-4 border-pink-500 pb-2">
         Gestión de Servicios
@@ -51,10 +70,11 @@
                     <td class="p-4 border border-pink-200 text-right">$ {{ number_format($servicio->precio, 2) }}</td>
                     <td class="p-4 border border-pink-200 flex justify-center space-x-3">
                         {{-- Botón Editar --}}
-                        <a href="#" 
-                           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300 text-sm font-medium select-none">
-                            Editar
-                        </a>
+                    <a href="{{ route('admin.servicios.edit', $servicio->id) }}"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300 text-sm font-medium select-none">
+                        Editar
+                    </a>
+
 
                         {{-- Botón Eliminar --}}
                         <form action="{{ route('admin.servicios.destroy', $servicio->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este servicio?')">

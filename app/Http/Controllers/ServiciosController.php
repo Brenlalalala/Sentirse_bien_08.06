@@ -83,5 +83,40 @@ public function destroy(Servicio $servicio)
     return redirect()->route('admin.servicios.index')->with('success', 'Servicio eliminado correctamente.');
 }
 
+public function edit($id)
+{
+    $servicio = Servicio::findOrFail($id);
+    return view('admin.servicios.edit', compact('servicio'));
+}
+
+
+public function update(Request $request, $id)
+{
+    $servicio = Servicio::findOrFail($id);
+
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'categoria' => 'required|string|max:255',
+        'subcategoria' => 'required|string|max:255',
+        'precio' => 'required|numeric|min:0',
+        'descripcion' => 'nullable|string',
+        'imagen' => 'nullable|image|max:2048',
+    ]);
+
+    $servicio->nombre = $request->nombre;
+    $servicio->categoria = $request->categoria;
+    $servicio->subcategoria = $request->subcategoria;
+    $servicio->precio = $request->precio;
+    $servicio->descripcion = $request->descripcion;
+
+    if ($request->hasFile('imagen')) {
+        $servicio->imagen = $request->file('imagen')->store('servicios', 'public');
+    }
+
+    $servicio->save();
+
+    return redirect()->route('admin.servicios.index')->with('success', 'Servicio actualizado correctamente.');
+}
+
 
 }
