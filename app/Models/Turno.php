@@ -21,4 +21,9 @@ class Turno extends Model
     {
         return $this->belongsTo(Servicio::class);
     }
+
+        public function profesional()
+    {
+        return $this->belongsTo(User::class, 'profesional_id');
+    }
 }

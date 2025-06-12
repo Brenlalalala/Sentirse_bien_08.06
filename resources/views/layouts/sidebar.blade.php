@@ -166,11 +166,11 @@
                     </x-button-link>
 
                 @elseif (Auth::user()->isProfesional())
-                    <x-button-link href="#">
+                    <x-button-link :href="route('profesional.turnos.dia')" :active="request()->routeIs('profesional.turnos.dia')">
                         <x-lucide-calendar-check class="w-5 h-5" />
                         Turnos del Día
                     </x-button-link>
-                    <x-button-link href="#">
+                    <x-button-link :href="route('profesional.historial.ver', Auth::user()->id)" :active="request()->routeIs('profesional.historial.ver', Auth::user()->id)">
                         <x-lucide-history class="w-5 h-5" />
                         Historial Clientes
                     </x-button-link>
