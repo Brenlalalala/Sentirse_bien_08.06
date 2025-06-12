@@ -24,6 +24,15 @@
         background-attachment: fixed;
         }
 
+    /* Ajusta el fondo para que no rompa en móviles */
+    @media (max-width: 640px) {
+    body {
+        background-size: cover;
+        background-attachment: scroll;
+    }
+}
+
+
     </style>
 
 </head>
@@ -110,7 +119,7 @@
 
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
+                        {{ __('Perfil') }}
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->
@@ -127,15 +136,21 @@
     </nav>
 
     {{-- 🔽 Acá comienza tu layout actual con Sidebar --}}
-    <div class="flex min-h-screen bg-white/80 backdrop-blur-sm rounded-xl shadow-xl">
+    <div class="flex flex-col sm:flex-row min-h-screen bg-white/80 backdrop-blur-sm rounded-xl shadow-xl">
 
 
         <!-- Sidebar -->
         <aside class="w-48 text-oscuro shadow-lg flex flex-col" style="background-color: #fce7f3;">
-            <div class="p-6 flex justify-center">
-                <a href="{{ route('home') }}" class="transform transition-transform duration-500 hover:scale-105">
-                    <img src="/imagenes/logo.png" alt="Logo Sentirse Bien" class="h-24 w-auto animate-fade-in">
-                </a>
+            <aside 
+                x-data="{ openSidebar: false }" 
+                :class="{'hidden': !openSidebar, 'block': openSidebar}" 
+                class="sm:block w-full sm:w-48 text-oscuro shadow-lg flex flex-col fixed sm:relative top-0 left-0 bg-pink-100 sm:bg-[#fce7f3] h-full z-40"
+            >
+                <div class="p-6 flex justify-center">
+                    <a href="{{ route('home') }}" class="transform transition-transform duration-500 hover:scale-105">
+                        <img src="/imagenes/logo.png" alt="Logo Sentirse Bien" class="h-24 w-auto animate-fade-in">
+                    </a>
+                </div>
             </div>
 
             <nav class="mt-6 space-y-2 text-ms">
@@ -201,8 +216,18 @@
 
         </aside>
 
+        <!-- botón para abrir/cerrar el sidebar en móviles -->
+        <div class="sm:hidden flex justify-between items-center p-4">
+            <button @click="openSidebar = !openSidebar" class="text-pink-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
         <!-- Content -->
-        <div class="flex-1 p-8">
+        <div class="flex-1 p-4 sm:p-8 overflow-auto">
             @yield('content')
         </div>
 
