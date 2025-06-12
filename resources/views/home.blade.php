@@ -262,13 +262,13 @@
 
             @auth
                <!-- Menú desplegable con usuario -->
-    <div class="relative">
-        <button id="userDropdown" class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2c-3 0-6 1.5-6 4v1h12v-1c0-2.5-3-4-6-4z" />
-            </svg>
-            <span>{{ auth()->user()->name }}</span>
-        </button>
+                <div class="relative">
+                    <button id="userDropdown" class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2c-3 0-6 1.5-6 4v1h12v-1c0-2.5-3-4-6-4z" />
+                        </svg>
+                        <span>{{ auth()->user()->name }}</span>
+                    </button>
 
     <!-- Menú desplegable -->
     <div id="userMenu" class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded shadow-md z-50">
@@ -649,8 +649,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
      // Dropdown usuario
      // Obtén el botón que activa el dropdown
-    const dropdownButton = document.getElementById('userDropdown');
-    const dropdownMenu = document.getElementById('userMenu');
+    // const dropdownButton = document.getElementById('userDropdown');
+    // const dropdownMenu = document.getElementById('userMenu');
 
     // Función para abrir/cerrar el dropdown
     if (dropdownButton && dropdownMenu) {
@@ -822,7 +822,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
 
-    </script>
+</script>
 
 
 <div id="scrollTopBtn" class="fixed bottom-5 right-5 cursor-pointer z-50 fade-out" title="Volver arriba">

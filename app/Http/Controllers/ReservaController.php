@@ -29,9 +29,6 @@ class ReservaController extends Controller
             abort(403, 'Inicia sesión para reservar.');
         }
         
-        Log::info('Método store ejecutado');
-        dd(Auth::id()); // Agrega esto para ver si se imprime y tiene valor
-
         Turno::create([
             'user_id' => Auth::id(), // 👈 Este es el que faltaba
             'servicio_id' => $request->servicio_id,

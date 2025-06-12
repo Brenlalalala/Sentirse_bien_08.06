@@ -19,14 +19,17 @@ return new class extends Migration
         });
     }
 
-    public function down(): void
+        public function down(): void
     {
         Schema::table('turnos', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+            if (Schema::hasColumn('turnos', 'user_id')) {
+                $table->dropForeign(['user_id']);
+                $table->dropColumn('user_id');
+            }
 
-            // Restaurar cliente_id si hacés rollback
-            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            // Evitá restaurar cliente_id porque la tabla clientes ya no existe
+            // $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
         });
     }
+
 };
