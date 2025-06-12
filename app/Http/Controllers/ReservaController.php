@@ -8,6 +8,7 @@ use App\Models\Reserva;
 use App\Models\Turno;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ReservaController extends Controller 
 {
@@ -25,15 +26,19 @@ class ReservaController extends Controller
         ]);
 
         if (!Auth::check()) {
-            abort(403, 'Debes iniciar sesión para reservar.');
+            abort(403, 'Inicia sesión para reservar.');
         }
+        
+        Log::info('Método store ejecutado');
+        dd(Auth::id()); // Agrega esto para ver si se imprime y tiene valor
 
-        $turno = new Turno();
-        $turno->user_id = Auth::id();
-        $turno->servicio_id = $request->servicio_id;
-        $turno->fecha = $request->fecha;
-        $turno->hora = $request->hora;
-        $turno->save();
+        Turno::create([
+            'user_id' => Auth::id(), // 👈 Este es el que faltaba
+            'servicio_id' => $request->servicio_id,
+            'fecha' => $request->fecha,
+            'hora' => $request->hora,
+            'estado' => 'pendiente',
+        ]);
 
         return redirect()->route('turnos.lista')->with('success', '✅ ¡Te estaremos contactando por mail para confirmar tu turno!');
     }

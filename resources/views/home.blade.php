@@ -244,9 +244,18 @@
         <a href="/" class="transform transition-transform duration-500 hover:scale-105">
             <img src="/imagenes/logo.png" alt="Logo Sentirse Bien" class="h-24 w-auto animate-fade-in">
         </a>
+                <!-- Responsive -->
+                <!-- Botón menú hamburguesa para móviles -->
+        <button id="menu-toggle" class="md:hidden text-white focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+
 
         <!-- Menú de navegación -->
-        <div id="nav-links" class="hidden md:flex space-x-4 items-center">
+        <div id="nav-links" class="hidden flex-col md:flex md:flex-row md:space-x-4 space-y-4 md:space-y-0 items-start md:items-center bg-pink-600 md:bg-transparent p-4 md:p-0 rounded-md absolute md:static top-full left-0 w-full md:w-auto z-40">
             <a href="/conocenos" class="text-white font-semibold px-4 py-2 rounded transition duration-300 hover:bg-pink-500 hover:text-white boton-brillante">Conócenos</a>
             <a href="/servicios" class="text-white font-semibold px-4 py-2 rounded transition duration-300 hover:bg-pink-500 hover:text-white boton-brillante">Servicios</a>
             <a href="#" id="ir-a-consultas-nav" class="text-white font-semibold px-4 py-2 rounded transition duration-300 hover:bg-pink-500 hover:text-white boton-brillante">Consultas</a>
@@ -799,6 +808,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 setTimeout(() => boton.classList.remove('boton-vibrador'), 500);
             }
         }, 2000); // cada 2 segundos
+
+        //responsive
+        // Alternar menú de navegación en móviles
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            const navLinks = document.getElementById('nav-links');
+            navLinks.classList.toggle('hidden');
+        });
+
+        // Opcional: alternar menú de usuario
+        document.getElementById('userDropdown')?.addEventListener('click', function () {
+            document.getElementById('userMenu')?.classList.toggle('hidden');
+        });
+
+
     </script>
 
 

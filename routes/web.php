@@ -40,7 +40,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/servicios', [ServiciosController::class, 'adminIndex'])->name('servicios.index');
     Route::post('/servicios', [ServiciosController::class, 'guardarServicio'])->name('servicios.store');
     Route::delete('/servicios/{servicio}', [ServiciosController::class, 'destroy'])->name('servicios.destroy');
-
+    Route::get('/servicios/{servicio}/edit', [ServiciosController::class, 'edit'])->name('servicios.edit');
+    Route::put('/servicios/{servicio}', [ServiciosController::class, 'update'])->name('servicios.update');
     // Turnos
     Route::get('/turnos', [TurnoController::class, 'index'])->name('turnos.index');
 
@@ -60,6 +61,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente/reservar-turno', [ClienteTurnoController::class, 'create'])->name('cliente.reservar-turno');
     Route::post('/cliente/reservar-turno', [ClienteTurnoController::class, 'store'])->name('cliente.reservar-turno.store');
+    Route::get('/cliente/servicios', [App\Http\Controllers\ServiciosController::class, 'index'])
+    ->name('cliente.servicios.index');
+
+
 });
 
 //chatbot
