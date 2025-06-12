@@ -69,11 +69,12 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
 });
 
 // Rutas para PROFESIONAL (sin prefijo, solo rol profesional)
-Route::middleware(['auth', 'role:profesional'])->group(function () {
-    Route::get('/profesional/turnos-del-dia', [ProfesionalController::class, 'turnosDelDia'])->name('profesional.turnos.dia');
-    Route::post('/profesional/historial/agregar', [ProfesionalController::class, 'agregarHistorial'])->name('profesional.historial.agregar');
-    Route::get('/profesional/cliente/{id}/historial', [ProfesionalController::class, 'verHistorial'])->name('profesional.historial.ver');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profesional/turnos-dia', [ProfesionalController::class, 'turnosDelDia'])->name('profesional.turnos.dia');
+    Route::post('/profesional/agregar-historial', [ProfesionalController::class, 'agregarHistorial'])->name('profesional.historial.agregar');
+    Route::get('/profesional/historial/{id}', [ProfesionalController::class, 'verHistorial'])->name('profesional.historial.ver');
 });
+
 
 
 //chatbot

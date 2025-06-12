@@ -16,7 +16,7 @@ class ProfesionalController extends Controller
     {
         $turnos = Turno::with(['usuario', 'servicio'])
             ->whereDate('fecha', now()->toDateString())
-            ->where('profesional_id', auth()->id())
+            ->where('profesional_id', Auth::id())
             ->get();
 
         return view('profesional.turnos-dia', compact('turnos'));
@@ -31,7 +31,7 @@ class ProfesionalController extends Controller
 
         Historial::create([
             'user_id' => $request->user_id,
-            'profesional_id' => auth()->id(),
+            'profesional_id' => Auth::id(),
             'detalle' => $request->detalle,
         ]);
 
