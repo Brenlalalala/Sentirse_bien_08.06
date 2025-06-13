@@ -60,7 +60,7 @@ class ClienteTurnoController extends Controller
             'servicio_id'   => $servicio_id,
             'fecha'         => $data['fecha'],
             'hora'          => $data['hora'],
-            'metodo_pago'   => $request->input('metodo_pago'),
+            'metodo_pago'   => 'required|in:debito', // Asegura que sea debito
             'monto'         => $servicio->precio, // ✅ guarda el monto
             'estado'        => 'pendiente', // también podés establecer esto directamente
         ]);
