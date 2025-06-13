@@ -2,76 +2,99 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Servicio;
 use App\Models\Turno;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ComprobantePago;
+use App\Http\Controllers\TurnoController;
 class ClienteTurnoController extends Controller
 {
+
+
     public function create()
     {
         $servicios = Servicio::all();
         return view('clientes.reservar-turno', compact('servicios'));
     }
 
+
     public function store(Request $request)
     {
         $serviciosSeleccionados = [];
 
-        // Filtrar servicios seleccionados
+        // Filtrar solo los servicios seleccionados
         foreach ($request->input('servicios', []) as $servicio_id => $data) {
             if (isset($data['seleccionado']) && $data['seleccionado']) {
                 $serviciosSeleccionados[$servicio_id] = $data;
             }
         }
 
+        // Si no hay servicios seleccionados, redirigir con error
         if (empty($serviciosSeleccionados)) {
             return redirect()->back()->withErrors(['Debe seleccionar al menos un servicio.'])->withInput();
         }
 
-        // Validación
+        // Validar solo los seleccionados
         foreach ($serviciosSeleccionados as $servicio_id => $data) {
             $request->validate([
-                "servicios.$servicio_id.fecha" => 'required|date|after_or_equal:today',
+                "servicios.$servicio_id.fecha" => 'required|date',
                 "servicios.$servicio_id.hora" => 'required|date_format:H:i',
             ]);
         }
 
+        // Validar método de pago fuera del loop
         $request->validate([
             'metodo_pago' => 'required',
         ]);
 
+        // Guardar los turnos
         foreach ($serviciosSeleccionados as $servicio_id => $data) {
-            $servicio = Servicio::findOrFail($servicio_id);
+            $servicio = Servicio::find($servicio_id);
 
             Turno::create([
-                'user_id'      => Auth::id(),
-                'servicio_id'  => $servicio_id,
-                'fecha'        => $data['fecha'],
-                'hora'         => $data['hora'],
-                'metodo_pago'  => $request->input('metodo_pago'),
-                'monto'        => $servicio->precio,
-                'estado'       => 'pendiente',
+                'user_id'       => Auth::id(),
+                'servicio_id'   => $servicio_id,
+                'fecha'         => $data['fecha'],
+                'hora'          => $data['hora'],
+                'metodo_pago'   => $request->input('metodo_pago'),
+                'monto'         => $servicio->precio, // ✅ guarda el monto
+                'estado'        => 'pendiente', // también podés establecer esto directamente
             ]);
+
         }
 
         return redirect()->route('cliente.mis-servicios')->with('success', 'Reserva realizada con éxito.');
     }
 
+
+    public function historial()
+    {
+        $cliente = Auth::user();
+
+        // Obtener los turnos realizados (pasados)
+        $turnosRealizados = Turno::with('servicio')
+            ->where('user_id', $cliente->id)
+            ->where('fecha', '<', now()->toDateString()) // Filtra por fecha pasada
+            ->orderByDesc('fecha')
+            ->orderByDesc('hora')
+            ->get();
+
+        return view('clientes.historial', compact('turnosRealizados'));
+    }
+
+
     public function misServicios()
     {
         $cliente = Auth::user();
 
+        // Obtener los turnos futuros (pendientes)
         $turnosPendientes = Turno::with('servicio')
             ->where('user_id', $cliente->id)
-            ->where(function ($query) {
-                $query->where('estado', 'pendiente')
-                      ->orWhere(function ($q) {
-                          $q->where('fecha', '>=', now()->toDateString());
-                      });
-            })
+            ->where('fecha', '>=', now()->toDateString()) // Filtra por fecha futura
             ->orderBy('fecha')
             ->orderBy('hora')
             ->get();
@@ -79,24 +102,6 @@ class ClienteTurnoController extends Controller
         return view('clientes.mis-servicios', compact('turnosPendientes'));
     }
 
-    public function historial()
-    {
-        $cliente = Auth::user();
-
-        $turnosRealizados = Turno::with('servicio')
-            ->where('user_id', $cliente->id)
-            ->where(function ($query) {
-                $query->where('estado', 'realizado')
-                      ->orWhere(function ($q) {
-                          $q->where('fecha', '<', now()->toDateString());
-                      });
-            })
-            ->orderByDesc('fecha')
-            ->orderByDesc('hora')
-            ->get();
-
-        return view('clientes.historial', compact('turnosRealizados'));
-    }
 
     public function cancelar(Turno $turno)
     {
@@ -105,10 +110,12 @@ class ClienteTurnoController extends Controller
         }
 
         if ($turno->estado === 'pendiente') {
-            $turno->delete();
+            $turno->delete(); // o marcarlo como cancelado
             return redirect()->route('cliente.mis-servicios')->with('success', 'Turno cancelado.');
         }
 
         return redirect()->route('cliente.mis-servicios')->with('error', 'No se puede cancelar este turno.');
     }
+
+
 }
