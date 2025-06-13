@@ -53,18 +53,13 @@ class ClienteTurnoController extends Controller
 
         // Guardar los turnos
         foreach ($serviciosSeleccionados as $servicio_id => $data) {
-        $servicio = Servicio::find($servicio_id);
-
-        Turno::create([
-            'user_id'       => Auth::id(),
-            'servicio_id'   => $servicio_id,
-            'fecha'         => $data['fecha'],
-            'hora'          => $data['hora'],
-            'metodo_pago'   => 'required|in:debito', // Asegura que sea debito
-            'monto'         => $servicio->precio, // ✅ guarda el monto
-            'estado'        => 'pendiente', // también podés establecer esto directamente
-        ]);
-
+            Turno::create([
+                'user_id'       => Auth::id(),
+                'servicio_id'   => $servicio_id,
+                'fecha'         => $data['fecha'],
+                'hora'          => $data['hora'],
+                'metodo_pago'   => $request->input('metodo_pago'),
+            ]);
         }
 
         return redirect()->route('cliente.mis-servicios')->with('success', 'Reserva realizada con éxito.');
