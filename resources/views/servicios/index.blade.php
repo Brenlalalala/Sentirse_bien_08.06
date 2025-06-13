@@ -63,7 +63,8 @@
                                         ${{ number_format($servicio->precio, 0, ',', '.') }} ARS
                                     </span>
                                     @auth
-                                        <button onclick="abrirModalDia('{{ $servicio->nombre }}')"
+                                        <button onclick="abrirModalDia('{{ $servicio->id }}', '{{ $servicio->nombre }}')"
+
                                             class="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition">
                                             Reservar
                                         </button>
@@ -138,7 +139,7 @@
     </div>
     {{-- MODAL: Datos del cliente --}}  
     <!-- Modal: Datos del cliente -->
-<form id="modal-datos" method="POST" action="{{ route('reservar') }}" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
+<!-- <form id="modal-datos" method="POST" action="{{ route('reservar') }}" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
     @csrf
     <input type="hidden" name="servicio_id" id="input-servicio">
     <input type="hidden" name="fecha" id="input-fecha">
@@ -160,7 +161,54 @@
             <button type="submit" class="bg-pink-500 px-4 py-2 rounded text-white">Reservar</button>
         </div>
     </div>
-</form>
+</form> -->
+<form method="POST" action="{{ route('cliente.reservar-turno.store') }}">
+
+
+        @csrf
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Selecciona servicios:</label>
+            <div class="space-y-2">
+                @foreach ($servicios as $servicio)
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}" class="form-checkbox text-blue-500">
+                        <span>{{ $servicio->nombre }} - ${{ $servicio->precio }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        <div>
+            <label for="fecha" class="block text-gray-700 font-medium mb-2">Fecha:</label>
+            <input type="date" name="fecha" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring focus:border-blue-400">
+        </div>
+
+        <div>
+            <label for="hora" class="block text-gray-700 font-medium mb-2">Hora:</label>
+            <input type="time" name="hora" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring focus:border-blue-400">
+        </div>
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Forma de pago:</label>
+            <div class="space-y-2">
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="forma_pago" value="debito" checked class="form-radio text-blue-500">
+                    <span>Tarjeta de débito (15% de descuento)</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="forma_pago" value="otro" class="form-radio text-blue-500">
+                    <span>Otro</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow transition duration-200">
+                Confirmar reserva
+            </button>
+        </div>
+    </form>
 
 
 
@@ -171,8 +219,9 @@ let servicioSeleccionado = '';
 let fechaSeleccionada = '';
 let horaSeleccionada = '';
 
-function abrirModalDia(servicio) {
-    servicioSeleccionado = servicio;
+function abrirModalDia(id, nombre) {
+    servicioSeleccionado = id;
+    document.getElementById('servicio-nombre').textContent = nombre;
 
     const inputFecha = document.getElementById('fecha-seleccionada');
 
@@ -210,13 +259,13 @@ document.getElementById('confirmar-dia').addEventListener('click', () => {
 
     const fechaSeleccionadaDate = new Date(fecha);
 
-    // ❌ Validar si es domingo (getDay() === 0)
+    // Validar si es domingo (getDay() === 0)
     if (fechaSeleccionadaDate.getDay() === 0) {
         alert('No se pueden reservar servicios los días domingo.');
         return;
     }
 
-    // ❌ Validar que falten al menos 48 horas
+    // Validar que falten al menos 48 horas
     const ahora = new Date();
   // Establecer hora en 00:00 para comparar solo fechas
     fechaSeleccionadaDate.setHours(0, 0, 0, 0);

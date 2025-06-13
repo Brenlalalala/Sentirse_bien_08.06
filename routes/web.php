@@ -65,8 +65,11 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente/servicios', [App\Http\Controllers\ServiciosController::class, 'index'])
     ->name('cliente.servicios.index');
 
+  
+   // Route::post('/cliente/turnos', [ClienteTurnoController::class, 'store'])->name('cliente.turnos.store');
 
 });
+
 
 // Rutas para PROFESIONAL (sin prefijo, solo rol profesional)
 Route::middleware(['auth'])->group(function () {

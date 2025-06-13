@@ -26,4 +26,10 @@ class Turno extends Model
     {
         return $this->belongsTo(User::class, 'profesional_id');
     }
+
+    public function pago()
+{
+    return $this->belongsTo(Pago::class);
+}
+
 }

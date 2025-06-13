@@ -54,6 +54,11 @@ class User extends Authenticatable
     return $this->hasMany(Turno::class);
 }
 
+public function pagos()
+{
+    return $this->hasMany(Pago::class);
+}
+
 
 }
 
