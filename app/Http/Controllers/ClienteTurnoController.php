@@ -16,48 +16,34 @@ class ClienteTurnoController extends Controller
         return view('clientes.reservar-turno', compact('servicios'));
     }
 
-    public function store(Request $request)
+    public function crearTurno($clienteId, $servicioId, $fecha, $hora)
     {
-        $serviciosSeleccionados = [];
+        $servicio = Servicio::findOrFail($servicioId);
+        $precioOriginal = $servicio->precio;
 
-        // Filtrar servicios seleccionados
-        foreach ($request->input('servicios', []) as $servicio_id => $data) {
-            if (isset($data['seleccionado']) && $data['seleccionado']) {
-                $serviciosSeleccionados[$servicio_id] = $data;
-            }
+        // Verificar si aplica descuento
+        $fechaServicio = new \DateTime($fecha . ' ' . $hora);
+        $ahora = new \DateTime();
+        $intervalo = $ahora->diff($fechaServicio);
+        $horasHastaServicio = ($intervalo->days * 24) + $intervalo->h;
+
+        $descuento = 0;
+        if ($horasHastaServicio >= 48) {
+            $descuento = 0.15; // Aplicar descuento del 15%
         }
 
-        if (empty($serviciosSeleccionados)) {
-            return redirect()->back()->withErrors(['Debe seleccionar al menos un servicio.'])->withInput();
-        }
+        // Calcular el precio final
+        $precioFinal = $precioOriginal * (1 - $descuento);
 
-        // Validación
-        foreach ($serviciosSeleccionados as $servicio_id => $data) {
-            $request->validate([
-                "servicios.$servicio_id.fecha" => 'required|date|after_or_equal:today',
-                "servicios.$servicio_id.hora" => 'required|date_format:H:i',
-            ]);
-        }
-
-        $request->validate([
-            'metodo_pago' => 'required',
+        // Crear el turno
+        return Turno::create([
+            'user_id' => $clienteId,
+            'servicio_id' => $servicioId,
+            'fecha' => $fecha,
+            'hora' => $hora,
+            'monto' => $precioFinal,  // Guardar el monto con descuento
+            'estado' => 'pendiente',
         ]);
-
-        foreach ($serviciosSeleccionados as $servicio_id => $data) {
-            $servicio = Servicio::findOrFail($servicio_id);
-
-            Turno::create([
-                'user_id'      => Auth::id(),
-                'servicio_id'  => $servicio_id,
-                'fecha'        => $data['fecha'],
-                'hora'         => $data['hora'],
-                'metodo_pago'  => $request->input('metodo_pago'),
-                'monto'        => $servicio->precio,
-                'estado'       => 'pendiente',
-            ]);
-        }
-
-        return redirect()->route('cliente.mis-servicios')->with('success', 'Reserva realizada con éxito.');
     }
 
     public function misServicios()
@@ -66,12 +52,7 @@ class ClienteTurnoController extends Controller
 
         $turnosPendientes = Turno::with('servicio')
             ->where('user_id', $cliente->id)
-            ->where(function ($query) {
-                $query->where('estado', 'pendiente')
-                      ->orWhere(function ($q) {
-                          $q->where('fecha', '>=', now()->toDateString());
-                      });
-            })
+            ->where('estado', 'pendiente')
             ->orderBy('fecha')
             ->orderBy('hora')
             ->get();
@@ -85,12 +66,7 @@ class ClienteTurnoController extends Controller
 
         $turnosRealizados = Turno::with('servicio')
             ->where('user_id', $cliente->id)
-            ->where(function ($query) {
-                $query->where('estado', 'realizado')
-                      ->orWhere(function ($q) {
-                          $q->where('fecha', '<', now()->toDateString());
-                      });
-            })
+            ->where('estado', 'realizado')
             ->orderByDesc('fecha')
             ->orderByDesc('hora')
             ->get();
