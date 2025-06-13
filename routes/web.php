@@ -67,7 +67,7 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     ->name('cliente.servicios.index');
 Route::get('/cliente/mis-servicios', [ClienteTurnoController::class, 'misServicios'])->name('cliente.mis-servicios');
 Route::delete('/cliente/turnos/{turno}/cancelar', [ClienteTurnoController::class, 'cancelar'])->name('cliente.turno.cancelar');
-
+Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->name('cliente.historial');
 
 });
 

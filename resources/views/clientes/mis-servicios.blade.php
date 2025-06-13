@@ -1,67 +1,46 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-5xl mx-auto py-10 px-4">
+<div class="container mx-auto py-10">
+    <h2 class="text-2xl font-bold text-pink-600 mb-6">Mis Servicios (Pendientes)</h2>
 
-    <h2 class="text-3xl font-semibold mb-6 text-pink-600">Mis Servicios</h2>
-
-    {{-- Servicios Pendientes --}}
-    <h4 class="text-xl font-semibold text-pink-700 mb-4">Servicios Pendientes</h4>
-    @if($pendientes->isEmpty())
-        <div class="bg-pink-100 text-pink-800 p-4 rounded-lg mb-6">
-            No hay servicios pendientes.
-        </div>
-    @else
-        <div class="grid md:grid-cols-2 gap-6">
-            @foreach($pendientes as $turno)
-                <div class="bg-white shadow-md rounded-lg p-5 border-l-4 border-pink-400 hover:shadow-lg transition">
-                    <h5 class="text-lg font-bold text-gray-800">{{ $turno->servicio->nombre }}</h5>
-                    <p class="text-sm text-gray-600 mt-1">
-                        <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}
-                    </p>
-                    <p class="text-sm text-gray-600"><strong>Hora:</strong> {{ $turno->hora }}</p>
-                    <p class="text-sm text-gray-600 mb-4"><strong>Precio:</strong> ${{ number_format($turno->monto, 2) }}</p>
-
-                    {{-- Botón Cancelar --}}
-                    <form action="{{ route('cliente.turno.cancelar', $turno->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="inline-block bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 text-sm transition">
-                            Cancelar
-                        </button>
-                    </form>
-                </div>
-            @endforeach
+    @if(session('success'))
+        <div class="bg-green-200 text-green-800 p-4 rounded mb-4">
+            {{ session('success') }}
         </div>
     @endif
 
-    {{-- Historial --}}
-    <h4 class="text-xl font-semibold text-pink-700 mt-10 mb-4">Historial de Servicios</h4>
-    @if($realizados->isEmpty())
-        <div class="bg-gray-100 text-gray-600 p-4 rounded-lg">
-            No hay servicios realizados aún.
-        </div>
+    @if($turnosPendientes->isEmpty())
+        <p class="text-gray-600">No tienes turnos pendientes.</p>
     @else
-        <div class="grid md:grid-cols-2 gap-6">
-            @foreach($realizados as $turno)
-                <div class="bg-gray-100 border-l-4 border-gray-400 shadow-sm rounded-lg p-5 hover:shadow-md transition">
-                    <h5 class="text-lg font-bold text-gray-700">{{ $turno->servicio->nombre }}</h5>
-                    <p class="text-sm text-gray-600 mt-1">
-                        <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}
-                    </p>
-                    <p class="text-sm text-gray-600"><strong>Hora:</strong> {{ $turno->hora }}</p>
-                    <p class="text-sm text-gray-600 mb-4"><strong>Precio:</strong> ${{ number_format($turno->monto, 2) }}</p>
-
-                    {{-- Botón Volver a Reservar --}}
-                    <a href="{{ route('cliente.reservar-turno') }}"
-                        class="inline-block bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 text-sm transition">
-                        Reservar nuevamente
-                    </a>
-                </div>
-            @endforeach
-        </div>
+        <table class="w-full table-auto border-collapse">
+            <thead class="bg-pink-200 text-pink-900 font-semibold">
+                <tr>
+                    <th class="p-2 border">Servicio</th>
+                    <th class="p-2 border">Fecha</th>
+                    <th class="p-2 border">Hora</th>
+                    <th class="p-2 border">Estado</th>
+                    <th class="p-2 border">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($turnosPendientes as $turno)
+                    <tr class="text-center">
+                        <td class="p-2 border">{{ $turno->servicio->nombre }}</td>
+                        <td class="p-2 border">{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
+                        <td class="p-2 border">{{ \Carbon\Carbon::parse($turno->hora)->format('H:i') }}</td>
+                        <td class="p-2 border capitalize">{{ $turno->estado ?? 'pendiente' }}</td>
+                        <td class="p-2 border">
+                            <form action="{{ route('cliente.turno.cancelar', $turno) }}" method="POST" onsubmit="return confirm('¿Estás seguro de cancelar este turno?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-800">Cancelar</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     @endif
-
 </div>
 @endsection

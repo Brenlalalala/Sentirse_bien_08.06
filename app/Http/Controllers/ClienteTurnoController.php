@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Servicio;
 use App\Models\Turno;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ComprobantePago;
-use App\Http\Controllers\TurnoController;
+
 class ClienteTurnoController extends Controller
 {
     public function create()
@@ -20,83 +17,85 @@ class ClienteTurnoController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'servicios' => 'required|array|min:1',
-        'servicios.*.fecha' => 'required|date|after_or_equal:' . now()->addDays(2)->format('Y-m-d'),
-        'servicios.*.hora' => 'required|date_format:H:i',
-        'metodo_pago' => 'required|in:debito',
-    ]);
-
-    $user = Auth::user();
-    $turnos = [];
-
-    foreach ($request->servicios as $servicioId => $datos) {
-        $servicio = Servicio::findOrFail($servicioId);
-
-        $fecha = $datos['fecha'];
-        $hora = $datos['hora'];
-
-        // Calcular descuento si aplica
-        $fechaHora = new \DateTime("$fecha $hora");
-        $ahora = new \DateTime();
-        $horas = ($fechaHora->getTimestamp() - $ahora->getTimestamp()) / 3600;
-
-        $descuento = $horas >= 48 ? 0.15 : 0;
-        $precioFinal = $servicio->precio * (1 - $descuento);
-
-        $turnos[] = Turno::create([
-            'user_id' => $user->id,
-            'servicio_id' => $servicio->id,
-            'fecha' => $fecha,
-            'hora' => $hora,
-            'estado' => 'pendiente',
-            'pagado' => true,
-            'monto' => $precioFinal,
-            'medio_pago' => 'debito',
-            'notas' => 'Reserva desde sistema web',
-        ]);
-    }
-
-    // (Opcional) Lógica para agrupar todos en un solo comprobante, si querés.
-
-    return redirect()->route('cliente.historial')
-        ->with('success', '¡Servicios reservados con éxito!');
-}
-
-    public function historial()
     {
-        $turnos = Turno::with('servicio')
-            ->where('user_id', Auth::id())
-            ->orderByDesc('fecha')
-            ->orderByDesc('hora')
-            ->get();
+        $serviciosSeleccionados = [];
 
-        return view('clientes.historial', compact('turnos'));
+        // Filtrar servicios seleccionados
+        foreach ($request->input('servicios', []) as $servicio_id => $data) {
+            if (isset($data['seleccionado']) && $data['seleccionado']) {
+                $serviciosSeleccionados[$servicio_id] = $data;
+            }
+        }
+
+        if (empty($serviciosSeleccionados)) {
+            return redirect()->back()->withErrors(['Debe seleccionar al menos un servicio.'])->withInput();
+        }
+
+        // Validación
+        foreach ($serviciosSeleccionados as $servicio_id => $data) {
+            $request->validate([
+                "servicios.$servicio_id.fecha" => 'required|date|after_or_equal:today',
+                "servicios.$servicio_id.hora" => 'required|date_format:H:i',
+            ]);
+        }
+
+        $request->validate([
+            'metodo_pago' => 'required',
+        ]);
+
+        foreach ($serviciosSeleccionados as $servicio_id => $data) {
+            $servicio = Servicio::findOrFail($servicio_id);
+
+            Turno::create([
+                'user_id'      => Auth::id(),
+                'servicio_id'  => $servicio_id,
+                'fecha'        => $data['fecha'],
+                'hora'         => $data['hora'],
+                'metodo_pago'  => $request->input('metodo_pago'),
+                'monto'        => $servicio->precio,
+                'estado'       => 'pendiente',
+            ]);
+        }
+
+        return redirect()->route('cliente.mis-servicios')->with('success', 'Reserva realizada con éxito.');
     }
-
 
     public function misServicios()
     {
         $cliente = Auth::user();
 
-        // Obtener todos los turnos del cliente con el servicio cargado
-        $turnos = Turno::with('servicio')
-                    ->where('user_id', $cliente->id)
-                    ->orderBy('fecha', 'desc')
-                    ->orderBy('hora', 'desc')
-                    ->get();
+        $turnosPendientes = Turno::with('servicio')
+            ->where('user_id', $cliente->id)
+            ->where(function ($query) {
+                $query->where('estado', 'pendiente')
+                      ->orWhere(function ($q) {
+                          $q->where('fecha', '>=', now()->toDateString());
+                      });
+            })
+            ->orderBy('fecha')
+            ->orderBy('hora')
+            ->get();
 
-        // Separar por estado
-        $pendientes = $turnos->filter(function ($turno) {
-            return Carbon::createFromFormat('Y-m-d H:i', $turno->fecha . ' ' . $turno->hora)->isFuture();
-        });
+        return view('clientes.mis-servicios', compact('turnosPendientes'));
+    }
 
-        $realizados = $turnos->filter(function ($turno) {
-            return Carbon::createFromFormat('Y-m-d H:i', $turno->fecha . ' ' . $turno->hora)->isPast();
-        });
+    public function historial()
+    {
+        $cliente = Auth::user();
 
-        return view('clientes.mis-servicios', compact('pendientes', 'realizados'));
+        $turnosRealizados = Turno::with('servicio')
+            ->where('user_id', $cliente->id)
+            ->where(function ($query) {
+                $query->where('estado', 'realizado')
+                      ->orWhere(function ($q) {
+                          $q->where('fecha', '<', now()->toDateString());
+                      });
+            })
+            ->orderByDesc('fecha')
+            ->orderByDesc('hora')
+            ->get();
+
+        return view('clientes.historial', compact('turnosRealizados'));
     }
 
     public function cancelar(Turno $turno)
@@ -106,12 +105,10 @@ class ClienteTurnoController extends Controller
         }
 
         if ($turno->estado === 'pendiente') {
-            $turno->delete(); // o marcarlo como cancelado
+            $turno->delete();
             return redirect()->route('cliente.mis-servicios')->with('success', 'Turno cancelado.');
         }
 
         return redirect()->route('cliente.mis-servicios')->with('error', 'No se puede cancelar este turno.');
     }
-
-
 }

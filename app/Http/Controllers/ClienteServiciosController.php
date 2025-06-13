@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Servicio;
-use App\Models\Reserva;
+use App\Models\Turno;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\ComprobantePago;
+use App\Http\Controllers\ClienteTurnoController;
 
 class ClienteServiciosController extends Controller
 {
@@ -57,16 +58,16 @@ class ClienteServiciosController extends Controller
 
                 $precioFinal = $precioOriginal * (1 - $descuento);
 
-                // Crear reserva
-                $reserva = Reserva::create([
-                    'cliente_id' => $cliente->id,
+                // Crear turno
+                $turno = ClienteTurnoController::create([
+                    'user_id' => $cliente->id,
                     'servicio_id' => $servicioId,
                     'fecha' => $fecha,
                     'hora' => $hora,
                     'precio' => $precioFinal,
                 ]);
 
-                $reservas[] = $reserva;
+                $turnos[] = $turno;
             }
         }
 
@@ -74,7 +75,7 @@ class ClienteServiciosController extends Controller
         $pagoAgrupado = count(array_unique($fechas)) === 1;
 
         // Enviar comprobante por email
-        Mail::to($cliente->email)->send(new ComprobantePago($reservas, $pagoAgrupado));
+        Mail::to($cliente->email)->send(new ComprobantePago($turnos, $pagoAgrupado));
 
         return redirect()->route('cliente.servicios.seleccionar')
             ->with('success', '✅ Reserva realizada con éxito. Recibirás un comprobante por email.');

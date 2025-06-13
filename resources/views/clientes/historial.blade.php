@@ -10,11 +10,11 @@
         </div>
     @endif
 
-    @if($turnos->isEmpty())
-        <p class="text-gray-600">Todavía no tenés turnos reservados.</p>
+    @if($turnosRealizados->isEmpty())
+        <p class="text-gray-600">No has realizado ningún servicio aún.</p>
     @else
         <table class="w-full table-auto border-collapse">
-            <thead class="bg-pink-200">
+            <thead class="bg-pink-200 text-pink-900 font-semibold">
                 <tr>
                     <th class="p-2 border">Servicio</th>
                     <th class="p-2 border">Fecha</th>
@@ -24,13 +24,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($turnos as $turno)
-                    <tr>
+                @foreach($turnosRealizados as $turno)
+                    <tr class="text-center">
                         <td class="p-2 border">{{ $turno->servicio->nombre }}</td>
-                        <td class="p-2 border">{{ $turno->fecha }}</td>
-                        <td class="p-2 border">{{ $turno->hora }}</td>
-                        <td class="p-2 border">${{ number_format($turno->monto, 2, ',', '.') }}</td>
-                        <td class="p-2 border capitalize">{{ $turno->estado }}</td>
+                        <td class="p-2 border">{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
+                        <td class="p-2 border">{{ \Carbon\Carbon::parse($turno->hora)->format('H:i') }}</td>
+                        <td class="p-2 border">${{ number_format($turno->monto ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-2 border capitalize">{{ $turno->estado ?? 'realizado' }}</td>
                     </tr>
                 @endforeach
             </tbody>
