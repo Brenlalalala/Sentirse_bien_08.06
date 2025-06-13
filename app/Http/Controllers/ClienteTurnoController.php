@@ -39,6 +39,7 @@ class ClienteTurnoController extends Controller
         return Turno::create([
             'user_id' => $clienteId,
             'servicio_id' => $servicioId,
+            'profesional_id' => 5, // ID del profesional por defecto
             'fecha' => $fecha,
             'hora' => $hora,
             'monto' => $precioFinal,  // Guardar el monto con descuento
