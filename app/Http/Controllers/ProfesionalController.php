@@ -19,7 +19,7 @@ class ProfesionalController extends Controller
             ->where('profesional_id', Auth::id())
             ->get();
 
-        return view('profesional.turnos-dia', compact('turnos'));
+        return view('profesionales.turnos-dia', compact('turnos'));
     }
 
     public function agregarHistorial(Request $request)
@@ -43,6 +43,6 @@ class ProfesionalController extends Controller
         $cliente = User::findOrFail($id);
         $historial = Historial::where('user_id', $id)->latest()->get();
 
-        return view('profesional.historial', compact('cliente', 'historial'));
+        return view('profesionales.historial', compact('cliente', 'historial'));
     }
 }
