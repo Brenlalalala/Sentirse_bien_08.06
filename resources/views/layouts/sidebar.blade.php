@@ -176,21 +176,17 @@
                     </x-button-link>
 
                 @elseif (Auth::user()->hasRole('cliente'))
-                    <x-button-link :href="route('cliente.servicios.index')" :active="request()->routeIs('cliente.reservar-turno')">
+                    <x-button-link :href="route('cliente.reservar-turno')" :active="request()->routeIs('cliente.reservar-turno')">
                         <x-lucide-calendar-plus class="w-5 h-5" />
                         Reservar Turno
                     </x-button-link>
-                    <x-button-link href="#">
+                    <x-button-link :href="route('cliente.mis-servicios')" :active="request()->routeIs('cliente.mis-servicios')">
                         <x-lucide-heart class="w-5 h-5" />
                         Mis Servicios
                     </x-button-link>
-                    <x-button-link href="#">
+                    <x-button-link :href="route('cliente.historial')" :active="request()->routeIs('cliente.historial')">
                         <x-lucide-history class="w-5 h-5" />
                         Historial
-                    </x-button-link>
-                    <x-button-link href="#">
-                        <x-lucide-user class="w-5 h-5" />
-                        Mi Perfil
                     </x-button-link>
                 @endif
             </nav>
