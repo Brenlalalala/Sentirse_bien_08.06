@@ -12,6 +12,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TurnosPorDiaController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfesionalController;
+use App\Http\Controllers\ClienteHistorialController;
 
 // Rutas públicas
 Route::get('/', fn() => view('home'))->name('home');
@@ -61,12 +62,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // Rutas para CLIENTE (sin prefijo, solo rol cliente)
 Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente/reservar-turno', [ClienteTurnoController::class, 'create'])->name('cliente.reservar-turno');
-    Route::post('/cliente/reservar-turno', [ClienteTurnoController::class, 'store'])->name('cliente.reservar-turno.store');
+    Route::post('/cliente/reservar-turno', [ClienteTurnoController::class, 'store'])->name('cliente.turnos.store');
     Route::get('/cliente/servicios', [App\Http\Controllers\ServiciosController::class, 'index'])
     ->name('cliente.servicios.index');
 
   
    // Route::post('/cliente/turnos', [ClienteTurnoController::class, 'store'])->name('cliente.turnos.store');
+
+Route::get('/cliente/mis-servicios', [ClienteTurnoController::class, 'misServicios'])->name('cliente.mis-servicios');
+Route::delete('/cliente/turnos/{turno}/cancelar', [ClienteTurnoController::class, 'cancelar'])->name('cliente.turno.cancelar');
+Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->name('cliente.historial');
 
 });
 
@@ -76,6 +81,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profesional/turnos-dia', [ProfesionalController::class, 'turnosDelDia'])->name('profesional.turnos.dia');
     Route::post('/profesional/agregar-historial', [ProfesionalController::class, 'agregarHistorial'])->name('profesional.historial.agregar');
     Route::get('/profesional/historial/{id}', [ProfesionalController::class, 'verHistorial'])->name('profesional.historial.ver');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->name('cliente.historial');
 });
 
 

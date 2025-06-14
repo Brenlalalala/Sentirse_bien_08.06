@@ -70,4 +70,6 @@ class ClienteTurnoController extends Controller
         // 8. Redirigir con mensaje
         return redirect()->route('cliente.servicios.index')->with('success', '¡Turno reservado y comprobante enviado!');
     }
+
+
 }
