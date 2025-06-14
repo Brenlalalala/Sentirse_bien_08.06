@@ -24,10 +24,9 @@ class Turno extends Model
         'pago_id',
     ];
 
-    
     protected $casts = [
         'fecha' => 'date',
-        'hora' => 'datetime:H:i', // solo hora, sin fecha
+        'hora' => 'datetime:H:i',
     ];
 
     public function user()
@@ -45,22 +44,19 @@ class Turno extends Model
         return $this->belongsTo(User::class, 'profesional_id');
     }
 
-<<<<<<< HEAD
     public function pago()
-{
-    return $this->belongsTo(Pago::class);
-}
+    {
+        return $this->belongsTo(Pago::class);
+    }
 
-=======
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($turno) {
             if (!$turno->estado) {
-                $turno->estado = 'pendiente'; // Estado predeterminado
+                $turno->estado = 'pendiente';
             }
         });
     }
->>>>>>> 542f9e335a0bea28e7175c9225760181c5fa472e
 }
