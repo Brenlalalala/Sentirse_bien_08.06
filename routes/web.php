@@ -40,10 +40,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Servicios
     Route::get('/servicios', [ServiciosController::class, 'adminIndex'])->name('servicios.index');
+    
     Route::post('/servicios', [ServiciosController::class, 'guardarServicio'])->name('servicios.store');
     Route::delete('/servicios/{servicio}', [ServiciosController::class, 'destroy'])->name('servicios.destroy');
     Route::get('/servicios/{servicio}/edit', [ServiciosController::class, 'edit'])->name('servicios.edit');
     Route::put('/servicios/{servicio}', [ServiciosController::class, 'update'])->name('servicios.update');
+    Route::get('/servicios/create', [ServiciosController::class, 'create'])->name('servicios.create');
+
+    
     // Turnos
     Route::get('/turnos', [TurnoController::class, 'index'])->name('turnos.index');
 
@@ -63,13 +67,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente/reservar-turno', [ClienteTurnoController::class, 'create'])->name('cliente.reservar-turno');
     Route::post('/cliente/reservar-turno', [ClienteTurnoController::class, 'store'])->name('cliente.turnos.store');
-    Route::get('/cliente/servicios', [App\Http\Controllers\ServiciosController::class, 'index'])
+    Route::get('/cliente/servicios', [ServiciosController::class, 'index'])
     ->name('cliente.servicios.index');
+
+  
+   // Route::post('/cliente/turnos', [ClienteTurnoController::class, 'store'])->name('cliente.turnos.store');
+
 Route::get('/cliente/mis-servicios', [ClienteTurnoController::class, 'misServicios'])->name('cliente.mis-servicios');
 Route::delete('/cliente/turnos/{turno}/cancelar', [ClienteTurnoController::class, 'cancelar'])->name('cliente.turno.cancelar');
 Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->name('cliente.historial');
 
 });
+
 
 // Rutas para PROFESIONAL (sin prefijo, solo rol profesional)
 Route::middleware(['auth'])->group(function () {

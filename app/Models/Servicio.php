@@ -22,6 +22,13 @@ class Servicio extends Model
         'precio',
         'imagen'
     ];
+
+    //para poder seleccionar el profesional por parte del cliente
+    public function profesionales()
+{
+    return $this->belongsToMany(User::class, 'profesional_servicio', 'servicio_id', 'user_id');
+}
+
 }
 
 

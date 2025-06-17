@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Servicio;
 use Illuminate\Http\Request;
 
+
 class ServiciosController extends Controller
 {
     /**
@@ -55,10 +56,11 @@ class ServiciosController extends Controller
         $servicio->categoria = $request->input('categoria');
         $servicio->subcategoria = $request->input('subcategoria');
 
-        if ($request->hasFile('imagen')) {
-            $rutaImagen = $request->file('imagen')->store('public/servicios');
-            $servicio->imagen = str_replace('public/', 'storage/', $rutaImagen); // acceso público
-        }
+       if ($request->hasFile('imagen')) {
+    $rutaImagen = $request->file('imagen')->store('servicios', 'public');
+    $servicio->imagen = 'storage/' . $rutaImagen;
+      }
+
         
         $servicio->save();
 

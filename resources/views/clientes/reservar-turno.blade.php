@@ -6,42 +6,93 @@
     </a>
 <div class="max-w-5xl mx-auto p-6 bg-white/80 rounded-xl shadow-md">
 
-    <h2 class="text-3xl font-bold text-pink-600 mb-6 text-center">Reservar Turno</h2>
+<div class="container mx-auto px-4 py-10">
+    <h1 class="text-4xl font-bold text-rose-600 mb-8">Reservar Turnos</h1>
 
-    {{-- Mensajes --}}
-    @if(session('success'))
-        <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if($errors->any())
-        <div class="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
-            <ul class="list-disc list-inside">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
+    @if ($errors->any())
+        <div class="bg-rose-100 text-rose-800 p-4 rounded mb-6 border border-rose-300">
+            <strong>¡Ups!</strong> Por favor corrige los siguientes errores:
+            <ul class="list-disc pl-6 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li class="text-base">{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
     @endif
 
-    <form method="POST" action="{{ route('cliente.turnos.store') }}">
+    <form action="{{ route('cliente.turnos.store') }}" method="POST" class="space-y-8">
         @csrf
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach ($servicios as $servicio)
-                <div class="border rounded-lg p-4 bg-white shadow hover:shadow-md transition">
-                    <label class="flex items-center gap-2 font-semibold">
-                        <input type="checkbox" name="servicios[{{ $servicio->id }}][seleccionado]" value="1" class="servicio-checkbox text-pink-600">
-                        {{ $servicio->nombre }} — ${{ number_format($servicio->precio, 0, ',', '.') }}
+                @php
+                    $rutaStorageRelativa = $servicio->imagen;
+                    $rutaStorageCompleta = public_path($rutaStorageRelativa);
+                    $rutaAlternativa = 'imagenes/' . \Illuminate\Support\Str::slug($servicio->nombre) . '.jpg';
+                    $rutaAlternativaCompleta = public_path($rutaAlternativa);
+
+                    if ($servicio->imagen && file_exists($rutaStorageCompleta)) {
+                        $rutaFinal = asset($rutaStorageRelativa);
+                    } elseif (file_exists($rutaAlternativaCompleta)) {
+                        $rutaFinal = asset($rutaAlternativa);
+                    } else {
+                        $rutaFinal = null;
+                    }
+                @endphp
+
+                <div class="bg-white border border-rose-200 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                    <label class="flex items-center p-4">
+                        <input type="checkbox" name="servicios[{{ $servicio->id }}][seleccionado]" value="1" class="form-checkbox text-rose-600 mr-2">
+                        <span class="text-xl font-semibold text-rose-700">{{ $servicio->nombre }}</span>
                     </label>
 
-                    <div class="hidden mt-4 servicio-inputs">
-                        <label class="block mb-2 text-sm">Fecha:</label>
-                        <input type="date" name="servicios[{{ $servicio->id }}][fecha]" class="w-full border rounded px-2 py-1 mb-2">
+                    @if($rutaFinal)
+                        <img src="{{ $rutaFinal }}" alt="{{ $servicio->nombre }}" class="w-full h-48 object-cover">
+                    @else
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 text-lg">
+                            Sin imagen
+                        </div>
+                    @endif
 
-                        <label class="block mb-2 text-sm">Hora:</label>
-                        <input type="time" name="servicios[{{ $servicio->id }}][hora]" class="w-full border rounded px-2 py-1" value="{{ old('servicios.' . $servicio->id . '.hora') }}">
+                    <div class="p-4 space-y-3">
+                        <p class="text-base text-gray-700 font-medium leading-snug">{{ $servicio->descripcion }}</p>
+                        <p class="text-lg font-bold text-rose-600">${{ number_format($servicio->precio, 2) }}</p>
+
+{{-- Selector de profesional --}}
+            @if($servicio->profesionales->count() > 0)
+                <label class="block mb-1 text-pink-500 font-semibold" for="profesional_{{ $servicio->id }}">
+                    Seleccione profesional para {{ $servicio->name }}
+                </label>
+                <select 
+                    id="profesional_{{ $servicio->id }}" 
+                    name="servicios[{{ $servicio->id }}][profesional_id]" 
+                    class="border border-pink-300 rounded p-2 w-full mb-3"
+                >
+                    @foreach($servicio->profesionales as $profesional)
+                                <option value="{{ $profesional->id }}">
+                                    {{ $profesional->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @else
+                        <p class="text-sm text-gray-400">No hay profesionales disponibles para este servicio.</p>
+                    @endif
+
+                        <div class="space-y-2 mt-4">
+                            <label class="block text-sm text-rose-700 font-semibold">Fecha (mínimo 48hs):</label>
+                            <input type="date" name="servicios[{{ $servicio->id }}][fecha]"
+                                class="w-full border border-rose-300 px-3 py-2 rounded focus:ring-rose-400 focus:border-rose-400"
+                                min="{{ \Carbon\Carbon::now()->addDays(2)->format('Y-m-d') }}">
+
+                            <label class="block text-sm text-rose-700 font-semibold mt-2">Hora (de 08 a 17hs):</label>
+                            <select name="servicios[{{ $servicio->id }}][hora]" class="w-full border border-rose-300 px-3 py-2 rounded focus:ring-rose-400 focus:border-rose-400">
+                                @for ($h = 8; $h <= 17; $h++)
+                                    <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00">
+                                        {{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
                     </div>
 
                         <label>Profesional:
@@ -56,60 +107,82 @@
             @endforeach
         </div>
 
-        <div class="mt-8">
-            <label for="metodo_pago" class="block font-semibold mb-2">Método de pago:</label>
-            <select name="metodo_pago" id="metodo_pago" class="border rounded px-3 py-2 w-full">
-                <option value="">-- Seleccioná una opción --</option>
-                <option value="debito">Tarjeta de débito</option>
+        <!--  Método de pago mixeado -->
+        <div class="mt-10">
+            <label for="metodo_pago" class="block mb-2 text-lg font-semibold text-rose-800">Método de pago:</label>
+            <select name="metodo_pago" id="metodo_pago" class="w-full border border-rose-300 px-4 py-3 rounded-lg focus:ring-rose-500 focus:border-rose-500" required>
+                <option value="">Seleccionar</option>
+                <option value="debito">Débito (15% de descuento si se paga anticipado)</option>
                 <option value="credito">Tarjeta de crédito</option>
                 <option value="efectivo">Efectivo</option>
-                {{-- Agregá más si tenés --}}
             </select>
         </div>
 
-        <div class="mt-6 text-center">
-            <button type="submit" class="bg-pink-500 text-white px-6 py-2 rounded hover:bg-pink-600 transition">
-                Confirmar Reserva
+        <div class="flex justify-end mt-6">
+            <button type="submit" class="bg-rose-600 text-white px-6 py-3 text-lg rounded-lg hover:bg-rose-700 transition">
+                Reservar Turnos
             </button>
         </div>
+
+        <!-- Resumen y contador -->
+        <div class="mt-8">
+            <p id="contadorServicios" class="text-rose-700 text-lg font-semibold mb-2">Servicios seleccionados: 0</p>
+
+            <div id="resumenServicios" class="bg-rose-50 border border-rose-300 rounded p-4 space-y-2 hidden">
+                <h3 class="text-rose-800 font-bold mb-2">Resumen de reservas:</h3>
+                <ul id="listaResumen" class="list-disc list-inside text-rose-700 text-base"></ul>
+            </div>
+        </div>
+
     </form>
 </div>
 
-{{-- Script para mostrar campos según checkbox --}}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.servicio-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function () {
-                const inputs = this.closest('div').querySelector('.servicio-inputs');
-                if (this.checked) {
-                    inputs.classList.remove('hidden');
-                } else {
-                    inputs.classList.add('hidden');
-                    // También podrías limpiar los valores si querés
-                    inputs.querySelectorAll('input').forEach(input => input.value = '');
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name$="[seleccionado]"]');
+        const contador = document.getElementById('contadorServicios');
+        const resumenBox = document.getElementById('resumenServicios');
+        const resumenLista = document.getElementById('listaResumen');
+
+        function actualizarUI() {
+            let total = 0;
+            resumenLista.innerHTML = '';
+
+            const horarios = [];
+
+            checkboxes.forEach((checkbox) => {
+                if (checkbox.checked) {
+                    total++;
+
+                    const servicioId = checkbox.name.match(/\d+/)[0];
+                    const nombre = checkbox.closest('.border').querySelector('span').textContent;
+                    const fecha = document.querySelector(`input[name="servicios[${servicioId}][fecha]"]`)?.value;
+                    const hora = document.querySelector(`select[name="servicios[${servicioId}][hora]"]`)?.value;
+
+                    // Agregar al resumen
+                    const item = document.createElement('li');
+                    item.textContent = `${nombre} - ${fecha || 'sin fecha'} a las ${hora || 'sin hora'}`;
+                    resumenLista.appendChild(item);
+
+                    // Validar superposición
+                    const fechaHora = `${fecha} ${hora}`;
+                    if (horarios.includes(fechaHora)) {
+                        item.classList.add('text-red-600');
+                        item.textContent += ' ⚠️ Horario duplicado';
+                    } else {
+                        horarios.push(fechaHora);
+                    }
                 }
             });
-        });
-    });
 
-    document.querySelector('form').addEventListener('submit', function(event) {
-    const horas = document.querySelectorAll('input[type="time"]');
-    let valid = true;
-
-    horas.forEach(function(horaInput) {
-        const horaValue = horaInput.value;
-        // Valida si la hora está en formato HH:MM
-        const regex = /^[0-2][0-9]:[0-5][0-9]$/;
-        if (!regex.test(horaValue)) {
-            valid = false;
-            alert('La hora debe tener el formato HH:MM');
+            contador.textContent = `Servicios seleccionados: ${total}`;
+            resumenBox.classList.toggle('hidden', total === 0);
         }
+
+        // Eventos
+        checkboxes.forEach(cb => cb.addEventListener('change', actualizarUI));
+        document.querySelectorAll('input[type="date"], select').forEach(el => el.addEventListener('change', actualizarUI));
     });
-
-    if (!valid) {
-        event.preventDefault(); // Evita el envío del formulario si hay un error
-    }
-});
-
 </script>
+
 @endsection

@@ -54,6 +54,17 @@ class User extends Authenticatable
     return $this->hasMany(Turno::class);
 }
 
+public function pagos()
+{
+    return $this->hasMany(Pago::class);
+}
+
+//para poder ver que scios. tiene un profesional
+public function servicios()
+{
+    return $this->belongsToMany(Servicio::class, 'profesional_servicio', 'user_id', 'servicio_id');
+}
+
 
 }
 
