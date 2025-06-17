@@ -1,102 +1,58 @@
 @extends('layouts.app')
 
 @section('content')
-
-@if(session('success'))
-    <div id="mensaje-exito" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-        {{ session('success') }}
+<div class="container mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-pink-600">Servicios</h1>
+        <a href="{{ route('admin.servicios.create') }}" class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition">
+            + Nuevo Servicio
+        </a>
     </div>
 
-    <script>
-        // Espera 3 segundos (3000 ms) y luego oculta el mensaje
-        setTimeout(function() {
-            var mensaje = document.getElementById('mensaje-exito');
-            if (mensaje) {
-                mensaje.style.display = 'none';
-            }
-        }, 3000);
-    </script>
-@endif
+    @if(session('success'))
+        <div class="bg-green-100 text-green-800 p-4 rounded mb-6">
+            {{ session('success') }}
+        </div>
+    @endif
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @forelse($servicios as $servicio)
+             @php
+             
+            // Genero el nombre del archivo y la ruta pública
+            $nombreArchivoImagen = Str::slug($servicio->nombre) . '.jpg';
+            $rutaImagen = asset('imagenes/' . $nombreArchivoImagen);
+            // Ruta del archivo físico para verificar si existe (opcional)
+            $rutaArchivoFisico = public_path('imagenes/' . $nombreArchivoImagen);
+        @endphp
 
+        <div class="bg-white rounded-xl shadow p-4">
+            @if(file_exists($rutaArchivoFisico))
+                <img src="{{ $rutaImagen }}" alt="{{ $servicio->nombre }}" class="w-full h-40 object-cover rounded mb-3">
+            @else
+                <div class="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400 mb-3 rounded">
+                    Sin imagen
+                </div>
+            @endif
 
-<div class="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
-    <h2 class="text-3xl font-extrabold text-pink-700 mb-8 border-b-4 border-pink-500 pb-2">
-        Gestión de Servicios
-    </h2>
+                <h2 class="text-xl font-semibold text-pink-700">{{ $servicio->nombre }}</h2>
+                <p class="text-gray-600 text-sm mb-2">{{ $servicio->categoria }} > {{ $servicio->subcategoria }}</p>
+                <p class="text-gray-700 mb-2">{{ $servicio->descripcion }}</p>
+                <p class="text-green-600 font-bold mb-3">$ {{ number_format($servicio->precio, 2) }}</p>
 
-    {{-- Botón para mostrar formulario --}}
-    <button onclick="document.getElementById('formulario-servicio').classList.toggle('hidden')"
-        class="mb-6 bg-pink-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-pink-700 transition duration-300 flex items-center gap-2 font-semibold">
-        <span class="text-xl">➕</span> Agregar Nuevo Servicio
-    </button>
+                <div class="flex justify-between">
+                    <a href="{{ route('admin.servicios.edit', $servicio->id) }}" class="text-yellow-600 hover:underline">Editar</a>
 
-    {{-- Formulario de creación (inicialmente oculto) --}}
-    <div id="formulario-servicio" class="hidden mb-10 bg-pink-50 p-6 rounded-lg shadow-sm border border-pink-300">
-        <form action="{{ route('admin.servicios.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            @csrf
-
-            <input type="text" name="nombre" placeholder="Nombre" class="border border-pink-400 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" required>
-            <input type="text" name="categoria" placeholder="Categoría" class="border border-pink-400 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" required>
-            <input type="text" name="subcategoria" placeholder="Subcategoría" class="border border-pink-400 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" required>
-            <input type="number" name="precio" step="0.01" placeholder="Precio" class="border border-pink-400 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" required>
-            <textarea name="descripcion" placeholder="Descripción" class="border border-pink-400 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 md:col-span-2" rows="4"></textarea>
-            <input type="file" name="imagen" class="md:col-span-2">
-            
-            <button type="submit" class="md:col-span-2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-700 transition duration-300 font-semibold">
-                Guardar Servicio
-            </button>
-        </form>
-    </div>
-
-    {{-- Tabla de servicios --}}
-    <div class="overflow-x-auto rounded-lg border border-pink-300 shadow-sm">
-        <table class="w-full table-auto border-collapse text-gray-900">
-            <thead class="bg-pink-300 text-pink-900 font-semibold uppercase text-sm">
-                <tr>
-                    <th class="p-4 border border-pink-400">Nombre</th>
-                    <th class="p-4 border border-pink-400">Categoría</th>
-                    <th class="p-4 border border-pink-400">Subcategoría</th>
-                    <th class="p-4 border border-pink-400 text-right">Precio</th>
-                    <th class="p-4 border border-pink-400 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white">
-                @foreach ($servicios as $servicio)
-                <tr class="hover:bg-pink-50 transition-colors">
-                    <td class="p-4 border border-pink-200">{{ $servicio->nombre }}</td>
-                    <td class="p-4 border border-pink-200">{{ $servicio->categoria }}</td>
-                    <td class="p-4 border border-pink-200">{{ $servicio->subcategoria }}</td>
-                    <td class="p-4 border border-pink-200 text-right">$ {{ number_format($servicio->precio, 2) }}</td>
-                    <td class="p-4 border border-pink-200 flex justify-center space-x-3">
-                        {{-- Botón Editar --}}
-                    <a href="{{ route('admin.servicios.edit', $servicio->id) }}"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300 text-sm font-medium select-none">
-                        Editar
-                    </a>
-
-
-                        {{-- Botón Eliminar --}}
-                        <form action="{{ route('admin.servicios.destroy', $servicio->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este servicio?')">
-                            @csrf
-                            @method('DELETE')
-                            <button 
-                              type="submit"
-                              class="bg-pink-600 text-white px-4 py-2 rounded-lg shadow hover:bg-pink-700 transition duration-300 text-sm font-medium select-none">
-                                Eliminar
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-
-                @if ($servicios->isEmpty())
-                <tr>
-                    <td colspan="5" class="text-center p-6 text-gray-400 italic">No hay servicios registrados.</td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
+                    <form action="{{ route('admin.servicios.destroy', $servicio->id) }}" method="POST" onsubmit="return confirm('¿Eliminar este servicio?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-600 hover:underline">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <p class="col-span-3 text-center text-gray-500">No hay servicios cargados aún.</p>
+        @endforelse
     </div>
 </div>
 @endsection

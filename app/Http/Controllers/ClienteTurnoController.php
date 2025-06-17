@@ -2,73 +2,116 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pago;
+
 use App\Models\Servicio;
 use App\Models\Turno;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ComprobantePagoMail;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
-
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ComprobantePago;
+use App\Http\Controllers\TurnoController;
 class ClienteTurnoController extends Controller
 {
+
+
+   public function create()
+{
+    $servicios = Servicio::with('profesionales')->get();
+    return view('clientes.reservar-turno', compact('servicios'));
+}
+
+
+
     public function store(Request $request)
     {
-        // 1. Validación
-        $request->validate([
-            'servicios' => 'required|array|min:1',
-            'fecha' => 'required|date|after_or_equal:' . Carbon::now()->addDays(2)->format('Y-m-d'),
-            'hora' => 'required',
-            'forma_pago' => 'required|in:debito,otro',
-        ]);
+        $serviciosSeleccionados = [];
 
-        $user = Auth::user();
+        // Filtrar solo los servicios seleccionados
+        foreach ($request->input('servicios', []) as $servicio_id => $data) {
+            if (isset($data['seleccionado']) && $data['seleccionado']) {
+                $serviciosSeleccionados[$servicio_id] = $data;
+            }
+        }
 
-        // 2. Preparación de fecha y hora
-        $fecha = Carbon::parse($request->fecha);
-        $hora = Carbon::parse($request->hora);
-        $fechaHoraTurno = $fecha->copy()->setTimeFrom($hora);
+        // Si no hay servicios seleccionados, redirigir con error
+        if (empty($serviciosSeleccionados)) {
+            return redirect()->back()->withErrors(['Debe seleccionar al menos un servicio.'])->withInput();
+        }
 
-        // 3. Obtener servicios y calcular subtotal
-        $servicios = Servicio::whereIn('id', $request->servicios)->get();
-        $subtotal = $servicios->sum('precio');
-
-        // 4. Calcular descuento si corresponde (48hs de anticipación y pago con débito)
-        $ahora = Carbon::now();
-        $horasAnticipacion = $ahora->diffInHours($fechaHoraTurno, false);
-        $aplicaDescuento = $horasAnticipacion >= 48 && $request->forma_pago === 'debito';
-
-        $descuento = $aplicaDescuento ? $subtotal * 0.15 : 0;
-        $total = $subtotal - $descuento;
-
-        // 5. Registrar el pago
-        $pago = Pago::create([
-            'user_id' => $user->id,
-            'monto' => $total,
-            'descuento' => $descuento,
-            'forma_pago' => $request->forma_pago,
-            'fecha_pago' => now(),
-        ]);
-
-        // 6. Crear turnos asociados al pago
-        foreach ($servicios as $servicio) {
-            Turno::create([
-                'cliente_id' => $user->id,
-                'servicio_id' => $servicio->id,
-                'fecha' => $request->fecha,
-                'hora' => $request->hora,
-                'estado' => 'pendiente',
-                'pago_id' => $pago->id, // asegúrate que el campo exista en la tabla `turnos`
+        // Validar solo los seleccionados
+        foreach ($serviciosSeleccionados as $servicio_id => $data) {
+            $request->validate([
+                "servicios.$servicio_id.fecha" => 'required|date',
+                "servicios.$servicio_id.hora" => 'required|date_format:H:i',
             ]);
         }
 
-        // 7. Enviar comprobante por correo
-        Mail::to($user->email)->send(new ComprobantePagoMail($pago));
+        // Validar método de pago fuera del loop
+        $request->validate([
+            'metodo_pago' => 'required',
+        ]);
 
-        // 8. Redirigir con mensaje
-        return redirect()->route('cliente.servicios.index')->with('success', '¡Turno reservado y comprobante enviado!');
+        // Guardar los turnos
+        foreach ($serviciosSeleccionados as $servicio_id => $data) {
+            Turno::create([
+                'user_id'       => Auth::id(),
+                'servicio_id'   => $servicio_id,
+                'profesional_id' => $data['profesional_id'],  // <--- nuevo
+                'fecha'         => $data['fecha'],
+                'hora'          => $data['hora'],
+                'metodo_pago'   => $request->input('metodo_pago'),
+            ]);
+        }
+
+        return redirect()->route('cliente.mis-servicios')->with('success', 'Reserva realizada con éxito.');
+    }
+
+
+    public function historial()
+    {
+        $cliente = Auth::user();
+
+        // Obtener los turnos realizados (pasados)
+        $turnosRealizados = Turno::with('servicio')
+            ->where('user_id', $cliente->id)
+            ->where('fecha', '<', now()->toDateString()) // Filtra por fecha pasada
+            ->orderByDesc('fecha')
+            ->orderByDesc('hora')
+            ->get();
+
+        return view('clientes.historial', compact('turnosRealizados'));
+    }
+
+
+    public function misServicios()
+    {
+        $cliente = Auth::user();
+
+        // Obtener los turnos futuros (pendientes)
+        $turnosPendientes = Turno::with('servicio')
+            ->where('user_id', $cliente->id)
+            ->where('fecha', '>=', now()->toDateString()) // Filtra por fecha futura
+            ->orderBy('fecha')
+            ->orderBy('hora')
+            ->get();
+
+        return view('clientes.mis-servicios', compact('turnosPendientes'));
+    }
+
+
+    public function cancelar(Turno $turno)
+    {
+        if ($turno->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($turno->estado === 'pendiente') {
+            $turno->delete(); // o marcarlo como cancelado
+            return redirect()->route('cliente.mis-servicios')->with('success', 'Turno cancelado.');
+        }
+
+        return redirect()->route('cliente.mis-servicios')->with('error', 'No se puede cancelar este turno.');
     }
 
 
