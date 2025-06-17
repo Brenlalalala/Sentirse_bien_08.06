@@ -11,7 +11,7 @@ class TurnoController extends Controller
 {
     public function index(Request $request)
     {
-        $turnos = Turno::with(['cliente', 'servicio'])
+        $turnos = Turno::with(['user', 'servicio'])
             ->orderBy('fecha')
             ->orderBy('hora')
             ->get();

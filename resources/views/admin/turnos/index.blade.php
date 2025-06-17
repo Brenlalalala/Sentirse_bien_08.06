@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.sidebar')
 
 @section('content')
 <div class="max-w-6xl mx-auto p-6 bg-white shadow rounded">
@@ -18,7 +18,7 @@
         <tbody>
             @foreach($turnos as $turno)
             <tr>
-                <td class="p-2 border">{{ $turno->cliente->name ?? 'Desconocido' }}</td>
+                <td class="p-2 border">{{ $turno->user->name ?? 'Desconocido' }}</td>
                 <td class="p-2 border">{{ $turno->servicio->nombre ?? 'N/A' }}</td>
                 <td class="p-2 border">{{ $turno->fecha }}</td>
                 <td class="p-2 border">{{ $turno->hora }}</td>

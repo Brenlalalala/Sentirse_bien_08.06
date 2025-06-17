@@ -11,7 +11,8 @@ class TurnosPorDiaController extends Controller
         // Si no se seleccionó fecha, usar hoy como predeterminado
         $fecha = $request->input('fecha', now()->toDateString());
 
-        $turnos = Turno::with(['cliente', 'servicio'])
+
+        $turnos = Turno::with(['user', 'servicio'])
             ->whereDate('fecha', $fecha)
             ->orderBy('hora')
             ->get();
