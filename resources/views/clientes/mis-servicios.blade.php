@@ -1,6 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.sidebar')
 
 @section('content')
+    <a href="{{ route('dashboard') }}" class="inline-block bg-pink-400 text-white px-1 py-1 rounded hover:bg-pink-500 mb-4">
+        ← Volver a Inicio
+    </a>
 <div class="container mx-auto py-10">
     <h2 class="text-2xl font-bold text-pink-600 mb-6">Mis Servicios (Pendientes)</h2>
 

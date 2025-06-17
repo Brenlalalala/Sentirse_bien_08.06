@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ComprobantePago;
 use App\Http\Controllers\TurnoController;
+use App\Models\User;
 class ClienteTurnoController extends Controller
 {
 
@@ -18,7 +19,9 @@ class ClienteTurnoController extends Controller
     public function create()
     {
         $servicios = Servicio::all();
-        return view('clientes.reservar-turno', compact('servicios'));
+        //Agregué profesionales para la vista de reserva de turno
+        $profesionales = User::where('role', 'profesional')->get(); 
+        return view('clientes.reservar-turno', compact('servicios', 'profesionales'));
     }
 
 
@@ -43,13 +46,10 @@ class ClienteTurnoController extends Controller
             $request->validate([
                 "servicios.$servicio_id.fecha" => 'required|date',
                 "servicios.$servicio_id.hora" => 'required|date_format:H:i',
+                //profesional_id es requerido y debe existir en la tabla users
+                "servicios.$servicio_id.profesional_id" => 'required|exists:users,id',
             ]);
         }
-
-        // Validar método de pago fuera del loop
-        $request->validate([
-            'metodo_pago' => 'required',
-        ]);
 
         // Guardar los turnos
         foreach ($serviciosSeleccionados as $servicio_id => $data) {
@@ -58,7 +58,8 @@ class ClienteTurnoController extends Controller
                 'servicio_id'   => $servicio_id,
                 'fecha'         => $data['fecha'],
                 'hora'          => $data['hora'],
-                'metodo_pago'   => $request->input('metodo_pago'),
+                'profesional_id'  => $data['profesional_id'],// Agregué profesional_id
+                'metodo_pago'     => $request->input('metodo_pago'),
             ]);
         }
 

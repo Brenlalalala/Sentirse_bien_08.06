@@ -4,7 +4,7 @@
 $baseClasses = 'flex items-center gap-3 px-4 py-3 rounded-md text-gray-600 text-sm font-medium transition-colors duration-200';
 
 $activeClasses = $active
-    ? 'bg-pink-600 text-pink-500 shadow-lg'
+    ? 'bg-pink-600 text-white shadow-lg'
     : 'hover:bg-pink-100 hover:text-pink-700';
 @endphp
 

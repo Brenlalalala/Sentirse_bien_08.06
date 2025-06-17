@@ -1,6 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.sidebar')
 
 @section('content')
+    <a href="{{ route('dashboard') }}" class="inline-block bg-pink-400 text-white px-1 py-1 rounded hover:bg-pink-500 mb-4">
+        ← Volver a Inicio
+    </a>
 <div class="max-w-5xl mx-auto p-6 bg-white/80 rounded-xl shadow-md">
 
     <h2 class="text-3xl font-bold text-pink-600 mb-6 text-center">Reservar Turno</h2>
@@ -40,6 +43,15 @@
                         <label class="block mb-2 text-sm">Hora:</label>
                         <input type="time" name="servicios[{{ $servicio->id }}][hora]" class="w-full border rounded px-2 py-1" value="{{ old('servicios.' . $servicio->id . '.hora') }}">
                     </div>
+
+                        <label>Profesional:
+                                <select name="servicios[{{ $servicio->id }}][profesional_id]">
+                                    <option value="">Seleccionar profesional</option>
+                                    @foreach ($profesionales as $profesional)
+                                        <option value="{{ $profesional->id }}">{{ $profesional->name }}</option>
+                                    @endforeach
+                                </select>
+                        </label>
                 </div>
             @endforeach
         </div>
@@ -49,6 +61,8 @@
             <select name="metodo_pago" id="metodo_pago" class="border rounded px-3 py-2 w-full">
                 <option value="">-- Seleccioná una opción --</option>
                 <option value="debito">Tarjeta de débito</option>
+                <option value="credito">Tarjeta de crédito</option>
+                <option value="efectivo">Efectivo</option>
                 {{-- Agregá más si tenés --}}
             </select>
         </div>

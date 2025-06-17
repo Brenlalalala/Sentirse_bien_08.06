@@ -23,10 +23,7 @@ class ClienteServiciosController extends Controller
         $request->validate([
             'servicios.*.fecha' => 'required_with:servicios.*.seleccionado|date|after_or_equal:today',
             'servicios.*.hora' => 'required_with:servicios.*.seleccionado|date_format:H:i',
-            'metodo_pago' => 'required|in:debito', // Solo débito permitido
-        ], [
-            'metodo_pago.required' => 'Debes seleccionar un método de pago.',
-            'metodo_pago.in' => 'Solo se permite el pago con tarjeta de débito.',
+            'metodo_pago' => 'required|in:debito,credito,efectivo', // Métodos de pago permitidos
         ]);
 
         $serviciosSeleccionados = $request->input('servicios', []);

@@ -13,7 +13,7 @@ use App\Http\Controllers\TurnosPorDiaController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfesionalController;
 use App\Http\Controllers\ClienteHistorialController;
-
+use App\Http\Controllers\DashboardController;
 // Rutas públicas
 Route::get('/', fn() => view('home'))->name('home');
 Route::get('/conocenos', fn() => view('conocenos'))->name('conocenos');
@@ -87,5 +87,11 @@ Route::middleware(['auth'])->group(function () {
 
 //chatbot
 Route::post('/chatbot', [ChatbotController::class, 'responder']);
+
+//Ruta para boton volver desde mis servicios a dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
 
 require __DIR__.'/auth.php';
