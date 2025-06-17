@@ -26,7 +26,7 @@
                     @foreach ($turnos as $turno)
                         <tr>
                             <td class="border px-4 py-2">{{ $turno->hora }}</td>
-                            <td class="border px-4 py-2">{{ $turno->cliente->name }}</td>
+                            <td class="border px-4 py-2">{{ $turno->user->name }}</td>
                             <td class="border px-4 py-2">{{ $turno->servicio->nombre }}</td>
                             <td class="border px-4 py-2">{{ $turno->estado }}</td>
                         </tr>

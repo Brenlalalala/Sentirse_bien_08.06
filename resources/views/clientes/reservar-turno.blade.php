@@ -58,7 +58,7 @@
                         <p class="text-base text-gray-700 font-medium leading-snug">{{ $servicio->descripcion }}</p>
                         <p class="text-lg font-bold text-rose-600">${{ number_format($servicio->precio, 2) }}</p>
 
-{{-- Selector de profesional --}}
+               {{-- Selector de profesional --}}
             @if($servicio->profesionales->count() > 0)
                 <label class="block mb-1 text-pink-500 font-semibold" for="profesional_{{ $servicio->id }}">
                     Seleccione profesional para {{ $servicio->name }}
@@ -94,15 +94,6 @@
                             </select>
                         </div>
                     </div>
-
-                        <label>Profesional:
-                                <select name="servicios[{{ $servicio->id }}][profesional_id]">
-                                    <option value="">Seleccionar profesional</option>
-                                    @foreach ($profesionales as $profesional)
-                                        <option value="{{ $profesional->id }}">{{ $profesional->name }}</option>
-                                    @endforeach
-                                </select>
-                        </label>
                 </div>
             @endforeach
         </div>
