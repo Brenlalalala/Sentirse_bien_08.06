@@ -50,6 +50,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // Turnos
     Route::get('/turnos', [TurnoController::class, 'index'])->name('turnos.index');
+    Route::get('/turnos/{id}/edit', [TurnoController::class, 'edit'])->name('turnos.edit');
+    Route::put('/turnos/{id}', [TurnoController::class, 'update'])->name('turnos.update');
+    Route::delete('/turnos/{id}', [TurnoController::class, 'destroy'])->name('turnos.cancelar');
+
 
     // Usuarios
     Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
