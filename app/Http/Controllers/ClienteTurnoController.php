@@ -14,9 +14,6 @@ use App\Http\Controllers\TurnoController;
 use App\Models\User;
 class ClienteTurnoController extends Controller
 {
-
-
-<<<<<<< HEAD
     public function create()
     {
         $servicios = Servicio::all();
@@ -24,15 +21,6 @@ class ClienteTurnoController extends Controller
         $profesionales = User::where('role', 'profesional')->get(); 
         return view('clientes.reservar-turno', compact('servicios', 'profesionales'));
     }
-=======
-   public function create()
-{
-    $servicios = Servicio::with('profesionales')->get();
-    return view('clientes.reservar-turno', compact('servicios'));
-}
-
->>>>>>> 6329d4cbacf21b9780ed68f07c7b733a23162168
-
 
     public function store(Request $request)
     {
@@ -68,7 +56,6 @@ class ClienteTurnoController extends Controller
                 'profesional_id' => $data['profesional_id'],  // <--- nuevo
                 'fecha'         => $data['fecha'],
                 'hora'          => $data['hora'],
-                'profesional_id'  => $data['profesional_id'],// Agregué profesional_id
                 'metodo_pago'     => $request->input('metodo_pago'),
             ]);
         }

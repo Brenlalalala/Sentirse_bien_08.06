@@ -94,15 +94,6 @@
                             </select>
                         </div>
                     </div>
-
-                        <label>Profesional:
-                                <select name="servicios[{{ $servicio->id }}][profesional_id]">
-                                    <option value="">Seleccionar profesional</option>
-                                    @foreach ($profesionales as $profesional)
-                                        <option value="{{ $profesional->id }}">{{ $profesional->name }}</option>
-                                    @endforeach
-                                </select>
-                        </label>
                 </div>
             @endforeach
         </div>
