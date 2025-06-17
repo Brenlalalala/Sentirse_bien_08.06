@@ -4,10 +4,10 @@
     <a href="{{ route('dashboard') }}" class="inline-block bg-pink-400 text-white px-1 py-1 rounded hover:bg-pink-500 mb-4">
         ← Volver a Inicio
     </a>
-<div class="max-w-5xl mx-auto p-6 bg-white/80 rounded-xl shadow-md">
+<div class="max-w-5xl mx-auto p-2 rounded-xl shadow-md">
 
-<div class="container mx-auto px-4 py-10">
-    <h1 class="text-4xl font-bold text-rose-600 mb-8">Reservar Turnos</h1>
+<div class="container mx-auto px-2 py-2">
+    <h1 class="text-3xl font-bold text-rose-600 mb-6">Reservar Turnos</h1>
 
     @if ($errors->any())
         <div class="bg-rose-100 text-rose-800 p-4 rounded mb-6 border border-rose-300">

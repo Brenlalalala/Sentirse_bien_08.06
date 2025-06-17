@@ -32,8 +32,8 @@
     {{-- 🔽 Aquí va tu navbar superior --}}
 
     {{-- 🔽 Aquí va tu navbar superior responsivo --}}
-    <nav x-data="{ open: false }" class="text-white shadow-md" style="background-color: #fbb6ce;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<nav x-data="{ open: false }" class="text-white shadow-md backdrop-blur-sm bg-pink-200/60">
+        <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-4">
             <div class="flex justify-between items-center h-24">
                 <!-- Logo (izquierda) -->
                 <div class="shrink-0 flex items-center">
@@ -123,12 +123,12 @@
     </nav>
 
     {{-- 🔽 Acá comienza tu layout actual con Sidebar --}}
-    <div class="flex min-h-screen bg-white/80 backdrop-blur-sm rounded-xl shadow-xl">
+    <div class="flex min-h-screen bg-white/70 backdrop-blur-sm rounded-xl shadow-xl">
 
         <!-- Sidebar -->
-        <aside class="w-48 text-oscuro shadow-lg flex flex-col" style="background-color: #fce7f3;">
+        <aside class="w-48 text-oscuro shadow-lg flex flex-col">
                 <!-- Foto de perfil y nombre del usuario -->
-            <div class="flex flex-col items-center mt-10 mb-6 px-4">
+            <div class="flex flex-col items-center mt-4 mb-6 px-4">
                 @if(Auth::user()->foto)
                     <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil"
                         class="h-20 w-20 rounded-full object-cover border-2 border-pink-300 shadow-md">
@@ -193,11 +193,6 @@
                     </x-button-link>
                 @endif
             </nav>
-
-            <div class="mt-auto p-4 text-center text-gray-500">
-                <p class="text-sm">© {{ date('Y') }} Sentirse Bien. Todos los derechos reservados.</p>
-            </div>
-
         </aside>
 
         <!-- Content -->
