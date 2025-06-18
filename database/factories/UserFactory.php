@@ -41,4 +41,28 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+
+    //se generan clientes y profesionales
+        public function cliente()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'name' => 'Cliente ' . Str::random(5),
+                'email' => 'cliente_' . Str::random(5) . '@mail.com',
+                'password' => Hash::make('clave123'), 
+            ];
+        });
+    }
+
+    public function profesional()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'name' => 'Profesional ' . Str::random(5),
+                'email' => 'profesional_' . Str::random(5) . '@mail.com',
+                'password' => Hash::make('clave123'),
+            ];
+        });
+    }
 }

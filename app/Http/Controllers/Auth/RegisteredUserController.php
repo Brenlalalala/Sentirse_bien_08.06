@@ -43,6 +43,10 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
+         // Aquí asignamos el rol cliente
+        $user->assignRole('cliente');
+        
+         // Login y redirección
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
