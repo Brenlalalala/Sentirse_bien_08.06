@@ -61,7 +61,7 @@
                {{-- Selector de profesional --}}
             @if($servicio->profesionales->count() > 0)
                 <label class="block mb-1 text-pink-500 font-semibold" for="profesional_{{ $servicio->id }}">
-                    Seleccione profesional para {{ $servicio->name }}
+                    Seleccioná profesional {{ $servicio->name }}
                 </label>
                 <select 
                     id="profesional_{{ $servicio->id }}" 

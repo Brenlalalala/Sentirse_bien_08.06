@@ -26,6 +26,28 @@
         <textarea name="descripcion" rows="4" class="w-full border px-4 py-2 rounded" placeholder="Descripción">{{ old('descripcion', $servicio->descripcion) }}</textarea>
 
         <div>
+            <label for="profesionales" class="block text-gray-700 font-semibold mb-2">Asignar Profesionales:</label>
+            <select 
+                name="profesionales[]" 
+                id="profesionales" 
+                multiple 
+                class="w-full border px-4 py-2 rounded bg-white text-gray-700"
+            >
+                @foreach($profesionales as $profesional)
+                    <option 
+                        value="{{ $profesional->id }}" 
+                        @if($servicio->profesionales->contains($profesional->id)) selected @endif
+                    >
+                        {{ $profesional->name }}
+                    </option>
+                @endforeach
+            </select>
+            <small class="text-gray-500 italic">Usá Ctrl (Windows) o Cmd (Mac) para seleccionar múltiples.</small>
+        </div>
+
+        
+        
+        <div>
             <label class="block mb-2 text-gray-700">Imagen actual:</label>
             @if($servicio->imagen)
                 <img src="{{ asset($servicio->imagen) }}" alt="Imagen actual" class="w-32 h-32 object-cover mb-2 rounded border">
