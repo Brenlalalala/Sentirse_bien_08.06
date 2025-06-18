@@ -127,20 +127,23 @@
 
         <!-- Sidebar -->
         <aside class="w-48 text-oscuro shadow-lg flex flex-col">
-                <!-- Foto de perfil y nombre del usuario -->
-            <div class="flex flex-col items-center mt-4 mb-6 px-4">
-                @if(Auth::user()->foto)
-                    <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil"
-                        class="h-20 w-20 rounded-lg object-cover border-2 border-pink-400 shadow-md"
-                @else
-                    <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300 shadow-md">
-                        <svg class="h-8 w-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
-                        </svg>
-                    </div>
-                @endif
-                <p class="mt-2 text-sm font-bold text-gray-700 text-center">{{ Auth::user()->name }}</p>
-            </div>
+<!-- Foto de perfil y nombre del usuario -->
+<div class="flex flex-col items-center mt-4 mb-6 px-4">
+    @if(Auth::user()->foto)
+        <!-- Imagen con bordes redondeados -->
+        <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil"
+            class="h-20 w-20 rounded-lg object-cover border-2 border-pink-400 shadow-md"
+        />
+    @else
+        <!-- Ícono de usuario con bordes redondeados -->
+        <div class="h-20 w-20 rounded-lg bg-gray-200 flex items-center justify-center border-2 border-gray-300 shadow-md">
+            <svg class="h-8 w-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+            </svg>
+        </div>
+    @endif
+    <p class="mt-2 text-sm font-bold text-gray-700 text-center">{{ Auth::user()->name }}</p>
+</div>
             <nav class="mt-18 space-y-2 text-ms">
                 @if (Auth::user()->isAdmin())
                     <x-button-link :href="route('admin.servicios.index')" :active="request()->routeIs('admin.servicios.index')">
