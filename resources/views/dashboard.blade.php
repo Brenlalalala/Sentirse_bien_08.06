@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="p-6 bg-white rounded shadow-md">
-        <h1 class="text-3xl font-bold text-pink-700 mb-4">
+        <h1 class="text-2xl font-bold text-pink-700 mb-4">
             ¡Bienvenid@ {{ Auth::user()->name }}!
         </h1>
 
@@ -20,10 +20,10 @@
         </p>
 
         <p class="text-gray-600">
-            Desde aquí podés acceder a todas tus funciones principales. Usá el menú lateral para navegar.
+            Desde aquí podés acceder a todas tus funciones principales. Por favor, usá el menú lateral para navegar.
         </p>
-        
-        @role('cliente')
+    </div> 
+       @role('cliente')
             <div class="relative p-2 bg-green-200 text-green-900 rounded-md shadow-lg my-6 postit-anim" style="clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%); width: 250px; height: 250px;">
                 <div class="flex items-start gap-3">
                     <svg class="w-6 h-6 text-green-700 mt-1" fill="currentColor" viewBox="0 0 20 20">
@@ -84,6 +84,5 @@
                 } 
 
             </style>
-        @endrole
-    </div>    
+        @endrole   
 @endsection

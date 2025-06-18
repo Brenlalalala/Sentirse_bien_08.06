@@ -99,12 +99,12 @@
         <p style="margin: 5px 0 2px; font-weight: bold;">Filtros aplicados:</p>
         <ul>
             @if($request->filled('fecha_inicio') && $request->filled('fecha_fin'))
-                <li>📅 Rango de fechas: {{ $fechaInicio }} a {{ $fechaFin }}</li>
+                <li>Rango de fechas: {{ $fechaInicio }} a {{ $fechaFin }}</li>
             @endif
-            @if($request->filled('servicio_id')) <li>🧴 Servicio ID: {{ $request->servicio_id }}</li> @endif
-            @if($request->filled('estado')) <li>📌 Estado: {{ ucfirst($request->estado) }}</li> @endif
-            @if($request->filled('profesional_id')) <li>👩‍⚕️ Profesional ID: {{ $request->profesional_id }}</li> @endif
-            @if($request->filled('cliente_nombre')) <li>👤 Cliente: {{ $request->cliente_nombre }}</li> @endif
+            @if($request->filled('servicio_id')) <li>Servicio ID: {{ $request->servicio_id }}</li> @endif
+            @if($request->filled('estado')) <li>Estado: {{ ucfirst($request->estado) }}</li> @endif
+            @if($request->filled('profesional_id')) <li>Profesional ID: {{ $request->profesional_id }}</li> @endif
+            @if($request->filled('cliente_nombre')) <li>Cliente: {{ $request->cliente_nombre }}</li> @endif
         </ul>
     </header>
 

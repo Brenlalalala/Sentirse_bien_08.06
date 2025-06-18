@@ -57,6 +57,19 @@ class TurnoController extends Controller
         return redirect()->back()->with('success', 'El turno fue cancelado correctamente.');
     }
 
+    public function verHistorialCliente(User $user)
+    {
+        // Obtener los turnos realizados por el cliente
+        $turnosRealizados = Turno::where('user_id', $user->id)
+            ->where('estado', 'realizado')
+            ->with('servicio')
+            ->orderByDesc('fecha')
+            ->get();
+
+        // Retornar la vista con los turnos
+        return view('admin.historial-cliente', compact('user', 'turnosRealizados'));
+    }
+
 
 
 }

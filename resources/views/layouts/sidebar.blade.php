@@ -32,7 +32,7 @@
     {{-- 🔽 Aquí va tu navbar superior --}}
 
     {{-- 🔽 Aquí va tu navbar superior responsivo --}}
-<nav x-data="{ open: false }" class="text-white shadow-md backdrop-blur-sm bg-pink-200/60">
+<nav x-data="{ open: false }" class="text-white shadow-md bg-pink-200/60">
         <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-4">
             <div class="flex justify-between items-center h-24">
                 <!-- Logo (izquierda) -->
@@ -131,7 +131,7 @@
             <div class="flex flex-col items-center mt-4 mb-6 px-4">
                 @if(Auth::user()->foto)
                     <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil"
-                        class="h-20 w-20 rounded-lg object-cover border-2 border-pink-300 shadow-md"
+                        class="h-20 w-20 rounded-lg object-cover border-2 border-pink-400 shadow-md"
                 @else
                     <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300 shadow-md">
                         <svg class="h-8 w-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@
                         </svg>
                     </div>
                 @endif
-                <p class="mt-2 text-sm font-semibold text-gray-700 text-center">{{ Auth::user()->name }}</p>
+                <p class="mt-2 text-sm font-bold text-gray-700 text-center">{{ Auth::user()->name }}</p>
             </div>
             <nav class="mt-18 space-y-2 text-ms">
                 @if (Auth::user()->isAdmin())
@@ -163,10 +163,11 @@
                         Ver Turnos por Día
                     </x-button-link>
 
-                    <x-button-link href="#">
+                    <x-button-link :href="route('admin.clientes')" :active="request()->routeIs('admin.clientes')">
                         <x-lucide-history class="w-5 h-5" />
                         Ver historial de clientes
                     </x-button-link>
+
 
                 @elseif (Auth::user()->isProfesional())
                     <x-button-link :href="route('profesional.turnos.dia')" :active="request()->routeIs('profesional.turnos.dia')">

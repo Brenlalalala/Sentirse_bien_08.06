@@ -109,4 +109,16 @@ Route::get('/dashboard', function () {
 // Ruta para imprimir turnos por dia ADMIN
 Route::get('/admin/turnos/imprimir', [TurnosPorDiaController::class, 'imprimir'])->name('admin.turnos.imprimir');
 
+
+use App\Http\Controllers\UserController;
+
+Route::get('/admin/clientes', [UserController::class, 'index'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clientes');
+
+Route::get('/admin/historial-cliente/{user}', [TurnoController::class, 'verHistorialCliente'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.historial.cliente');
+
+
 require __DIR__.'/auth.php';

@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-<div class="max-w-6xl mx-auto p-6 bg-white shadow rounded">
+<div class="max-w-6xl mx-auto p-6 shadow rounded">
     <h2 class="text-2xl font-bold text-pink-600 mb-6">Gestión de Turnos</h2>
 
     {{-- Mensaje de éxito --}}
@@ -12,30 +12,30 @@
         </div>
     @endif
 
-    <table class="w-full table-auto border-collapse">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="p-2 border">Servicio</th>
-                <th class="p-2 border">Cliente</th>
-                <th class="p-2 border">Fecha</th>
-                <th class="p-2 border">Hora</th>
-                <th class="p-2 border">Estado</th>
-                <th class="p-2 border">Profesional</th>
-                <th class="p-2 border">Acciones</th>
+    <div class="overflow-x-auto">
+         <table class="min-w-full bg-white rounded shadow mb-8">
+            <thead class="bg-pink-100 text-pink-700 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left">Servicio</th>
+                <th class="py-3 px-6 text-left">Cliente</th>
+                <th class="py-3 px-6 text-left">Fecha</th>
+                <th class="py-3 px-6 text-left">Hora</th>
+                <th class="py-3 px-6 text-left">Estado</th>
+                <th class="py-3 px-6 text-left">Profesional</th>
+                <th class="py-3 px-6 text-left">Acciones</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="text-gray-700 text-sm">
             @foreach($turnos as $turno)
-            <tr>
-                <td class="p-2 border">{{ $turno->servicio->nombre ?? 'N/A' }}</td>
-                <td class="p-2 border">{{ $turno->user->name ?? 'Desconocido' }}</td>
-                <td class="p-2 border">
+            <tr class="border-b border-gray-200 hover:bg-pink-50 transition">
+                <td class="py-2 px-4 whitespace-nowrap">{{ $turno->servicio->nombre ?? 'N/A' }}</td>
+                <td class="py-2 px-4 whitespace-nowrap">{{ $turno->user->name ?? 'Desconocido' }}</td>
+                <td class="py-2 px-4 whitespace-nowrap">
                     {{ ucfirst(\Carbon\Carbon::parse($turno->fecha)->locale('es')->translatedFormat('l d \d\e F \d\e Y')) }}
                 </td>
-                <td class="p-2 border">{{ \Carbon\Carbon::parse($turno->hora)->format('H:i') }}</td>
-                <td class="p-2 border">{{ ucfirst($turno->estado) }}</td>
-                <td class="p-2 border">{{ $turno->profesional->name ?? 'No asignado' }}</td>
-                <td class="p-2 border">
+                <td class="py-2 px-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($turno->hora)->format('H:i') }}</td>
+                <td class="py-2 px-4 whitespace-nowrap">{{ ucfirst($turno->estado) }}</td>
+                <td class="py-2 px-4 whitespace-nowrap">{{ $turno->profesional->name ?? 'No asignado' }}</td>
+                <td class="py-2 px-4 whitespace-nowrap">
                     <a href="{{ route('admin.turnos.edit', $turno->id) }}" class="text-blue-600 hover:underline">Editar</a>
 
                     <form action="{{ route('admin.turnos.cancelar', $turno->id) }}" method="POST" class="inline">

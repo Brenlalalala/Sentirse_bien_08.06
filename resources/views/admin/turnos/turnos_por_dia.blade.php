@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="mt-8">
-    <h2 class="text-3xl font-bold mb-6 text-pink-600">Turnos por día</h2>
+    <h2 class="text-2xl font-bold mb-6 text-pink-600">Turnos por día</h2>
 
     <!-- Formulario de filtros -->
     <form method="GET" action="{{ route('admin.turnos.dia') }}" class="mb-8">
