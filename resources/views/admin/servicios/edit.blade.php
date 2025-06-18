@@ -28,7 +28,8 @@
         <div>
             <label for="profesionales" class="block text-gray-700 font-semibold mb-2">Asignar Profesionales:</label>
             <select 
-                name="profesionales[]" 
+                name="profesionales[]"
+                multiple
                 id="profesionales" 
                 multiple 
                 class="w-full border px-4 py-2 rounded bg-white text-gray-700"
