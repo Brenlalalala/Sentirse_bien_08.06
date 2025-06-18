@@ -5,72 +5,75 @@
     <h2 class="text-3xl font-bold mb-6 text-pink-600">Turnos por día</h2>
 
     <!-- Formulario de filtros -->
-    <form method="GET" action="{{ route('admin.turnos.dia') }}" class="mb-8 grid grid-cols-1 md:grid-cols-6 gap-4">
-        <div>
-            <label class="block font-semibold mb-1">Fecha Inicio:</label>
-            <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio', now()->toDateString()) }}" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
-        </div>
-        <div>
-            <label class="block font-semibold mb-1">Fecha Fin:</label>
-            <input type="date" name="fecha_fin" value="{{ request('fecha_fin', now()->toDateString()) }}" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
-        </div>
-        <div>
-            <label class="block font-semibold mb-1">Servicio:</label>
-            <select name="servicio_id" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
-                <option value="">Todos</option>
-                @foreach($servicios as $servicio)
-                    <option value="{{ $servicio->id }}" {{ request('servicio_id') == $servicio->id ? 'selected' : '' }}>
-                        {{ $servicio->nombre }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label class="block font-semibold mb-1">Estado:</label>
-            <select name="estado" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
-                <option value="">Todos</option>
-                <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                <option value="confirmado" {{ request('estado') == 'confirmado' ? 'selected' : '' }}>Confirmado</option>
-                <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
-            </select>
-        </div>
-        <div>
-            <label class="block font-semibold mb-1">Profesional:</label>
-            <select name="profesional_id" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
-                <option value="">Todos</option>
-                @foreach($profesionales as $profesional)
-                    <option value="{{ $profesional->id }}" {{ request('profesional_id') == $profesional->id ? 'selected' : '' }}>
-                        {{ $profesional->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label class="block font-semibold mb-1">Cliente:</label>
-            <input type="text" name="cliente_nombre" value="{{ request('cliente_nombre') }}" placeholder="Nombre del cliente" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+    <form method="GET" action="{{ route('admin.turnos.dia') }}" class="mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div>
+                <label class="block font-semibold mb-1">Fecha Inicio:</label>
+                <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio', now()->toDateString()) }}" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Fecha Fin:</label>
+                <input type="date" name="fecha_fin" value="{{ request('fecha_fin', now()->toDateString()) }}" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Servicio:</label>
+                <select name="servicio_id" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+                    <option value="">Todos</option>
+                    @foreach($servicios as $servicio)
+                        <option value="{{ $servicio->id }}" {{ request('servicio_id') == $servicio->id ? 'selected' : '' }}>
+                            {{ $servicio->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Estado:</label>
+                <select name="estado" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+                    <option value="">Todos</option>
+                    <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                    <option value="confirmado" {{ request('estado') == 'confirmado' ? 'selected' : '' }}>Confirmado</option>
+                    <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Profesional:</label>
+                <select name="profesional_id" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+                    <option value="">Todos</option>
+                    @foreach($profesionales as $profesional)
+                        <option value="{{ $profesional->id }}" {{ request('profesional_id') == $profesional->id ? 'selected' : '' }}>
+                            {{ $profesional->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Cliente:</label>
+                <input type="text" name="cliente_nombre" value="{{ request('cliente_nombre') }}" placeholder="Nombre del cliente" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+            </div>
         </div>
 
-        <div class="md:col-span-6 text-right">
-            <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold px-6 py-2 rounded shadow transition">Filtrar</button>
+        <!-- Botones: Filtrar e Imprimir PDF -->
+        <div class="flex justify-end gap-4 mt-4">
+            <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold px-6 py-2 rounded shadow transition">
+                Filtrar
+            </button>
+
+            <a href="{{ route('admin.turnos.imprimir', request()->all()) }}" target="_blank"
+               class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow transition">
+                Imprimir PDF
+            </a>
         </div>
     </form>
 
-    <!-- Boton imprimir -->
-    <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.turnos.imprimir', request()->all()) }}" target="_blank"
-        class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition shadow">
-            Imprimir PDF
-        </a>
-    </div>
-
     <!-- Resultados -->
     @if ($turnos->isEmpty())
-        <p class="text-lg text-gray-600">No hay turnos para estos filtros.</p>
+        <p class="text-lg text-gray-600 mt-6">No hay turnos para estos filtros.</p>
     @else
         @foreach ($turnos as $key => $listaTurnos)
             @php
                 [$fecha, $servicio] = explode('|', $key);
             @endphp
+
             <h3 class="text-2xl font-semibold mt-6 mb-2 text-pink-600">
                 {{ ucfirst(\Carbon\Carbon::parse($fecha)->locale('es')->translatedFormat('l d \d\e F \d\e Y')) }}
             </h3>
@@ -84,28 +87,6 @@
                             <th class="py-3 px-6 text-left">Servicio</th>
                             <th class="py-3 px-6 text-left">Profesional</th>
                             <th class="py-3 px-6 text-left">Estado</th>
-
-            <div>
-                <button type="submit" class="bg-pink-600 text-white px-4 py-2 rounded">Filtrar</button>
-            </div>
-
-            <div>
-                <button
-                    type="submit"
-                    name="exportar_pdf"
-                    value="1"
-                    class="bg-gray-700 text-white px-4 py-2 rounded"
-                >
-                    Exportar PDF
-                </button>
-            </div>
-        </form>
-
-        <!-- Mensaje de error -->
-        @if ($turnos->isEmpty())
-            <p class="text-lg">No hay turnos para esta fecha.</p>
-        @else
-
                         </tr>
                     </thead>
                     <tbody class="text-gray-700 text-sm">
