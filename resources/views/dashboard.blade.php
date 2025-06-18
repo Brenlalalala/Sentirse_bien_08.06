@@ -23,4 +23,6 @@
             Desde aquí podés acceder a todas tus funciones principales. Usá el menú lateral para navegar.
         </p>
     </div>
+
+    
 @endsection
