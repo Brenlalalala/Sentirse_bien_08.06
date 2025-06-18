@@ -2,7 +2,7 @@
 
 return [
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Spa Sentirse Bien'),
 
     'env' => env('APP_ENV', 'production'),
 
@@ -86,5 +86,12 @@ return [
         App\Providers\ConsoleServiceProvider::class,
 
     ],
+
+    'aliases' => [
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
+        'Auth' => Illuminate\Support\Facades\Auth::class,
+        'Str' => Illuminate\Support\Str::class,
+        'Route' => Illuminate\Support\Facades\Route::class,
+    ]
 
 ];

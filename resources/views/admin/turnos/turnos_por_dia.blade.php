@@ -1,84 +1,105 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="mt-10">
-        <h2 class="text-3xl font-bold mb-6">Turnos por día</h2>
+<div class="mt-8">
+    <h2 class="text-3xl font-bold mb-6 text-pink-600">Turnos por día</h2>
 
-        <!-- se modifica el formulario para seleccionar la fecha -->
-<form method="GET" action="{{ route('admin.turnos.dia') }}" class="mb-6 flex flex-wrap gap-4">
-    <!-- Fecha -->
-    <div>
-        <label for="fecha" class="block text-lg font-medium">Fecha:</label>
-        <input
-            type="date"
-            name="fecha"
-            id="fecha"
-            value="{{ $fecha }}"
-            class="mt-1 p-2 border rounded-md"
-            onchange="this.form.submit()"
-        >
+    <!-- Formulario de filtros -->
+    <form method="GET" action="{{ route('admin.turnos.dia') }}" class="mb-8 grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div>
+            <label class="block font-semibold mb-1">Fecha Inicio:</label>
+            <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio', now()->toDateString()) }}" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Fecha Fin:</label>
+            <input type="date" name="fecha_fin" value="{{ request('fecha_fin', now()->toDateString()) }}" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Servicio:</label>
+            <select name="servicio_id" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+                <option value="">Todos</option>
+                @foreach($servicios as $servicio)
+                    <option value="{{ $servicio->id }}" {{ request('servicio_id') == $servicio->id ? 'selected' : '' }}>
+                        {{ $servicio->nombre }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Estado:</label>
+            <select name="estado" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+                <option value="">Todos</option>
+                <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                <option value="confirmado" {{ request('estado') == 'confirmado' ? 'selected' : '' }}>Confirmado</option>
+                <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
+            </select>
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Profesional:</label>
+            <select name="profesional_id" class="form-select w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+                <option value="">Todos</option>
+                @foreach($profesionales as $profesional)
+                    <option value="{{ $profesional->id }}" {{ request('profesional_id') == $profesional->id ? 'selected' : '' }}>
+                        {{ $profesional->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Cliente:</label>
+            <input type="text" name="cliente_nombre" value="{{ request('cliente_nombre') }}" placeholder="Nombre del cliente" class="form-input w-full rounded border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500">
+        </div>
+
+        <div class="md:col-span-6 text-right">
+            <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold px-6 py-2 rounded shadow transition">Filtrar</button>
+        </div>
+    </form>
+
+    <!-- Boton imprimir -->
+    <div class="flex justify-end mb-4">
+        <a href="{{ route('admin.turnos.imprimir', request()->all()) }}" target="_blank"
+        class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition shadow">
+            Imprimir PDF
+        </a>
     </div>
 
-    <!-- Servicio -->
-    <div>
-        <label for="servicio_id" class="block text-lg font-medium">Servicio:</label>
-        <select
-            name="servicio_id"
-            id="servicio_id"
-            class="mt-1 p-2 border rounded-md"
-            onchange="this.form.submit()"
-        >
-            <option value="">Todos</option>
-            @foreach($servicios as $servicio)
-                <option value="{{ $servicio->id }}" {{ request('servicio_id') == $servicio->id ? 'selected' : '' }}>
-                    {{ $servicio->nombre }}
-                </option>
-            @endforeach
-        </select>
-    </div>
+    <!-- Resultados -->
+    @if ($turnos->isEmpty())
+        <p class="text-lg text-gray-600">No hay turnos para estos filtros.</p>
+    @else
+        @foreach ($turnos as $key => $listaTurnos)
+            @php
+                [$fecha, $servicio] = explode('|', $key);
+            @endphp
+            <h3 class="text-2xl font-semibold mt-6 mb-2 text-pink-600">
+                {{ ucfirst(\Carbon\Carbon::parse($fecha)->locale('es')->translatedFormat('l d \d\e F \d\e Y')) }}
+            </h3>
 
-    <!-- Estado -->
-    <div>
-        <label for="estado" class="block text-lg font-medium">Estado:</label>
-        <select
-            name="estado"
-            id="estado"
-            class="mt-1 p-2 border rounded-md"
-            onchange="this.form.submit()"
-        >
-            <option value="">Todos</option>
-            <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-            <option value="confirmado" {{ request('estado') == 'confirmado' ? 'selected' : '' }}>Confirmado</option>
-            <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
-        </select>
-    </div>
-</form>
-        <!-- Mensaje de error -->
-        @if ($turnos->isEmpty())
-            <p class="text-lg">No hay turnos para esta fecha.</p>
-        @else
-            @foreach ($turnos as $servicio => $listaTurnos)
-                <h3 class="text-2xl font-semibold mt-8 mb-4 text-pink-600">{{ $servicio }}</h3>
-                <table class="w-full table-auto border-collapse border border-gray-300 text-lg mb-6">
-                    <thead>
-                        <tr class="bg-pink-100">
-                            <th class="border px-4 py-2">Hora</th>
-                            <th class="border px-4 py-2">Cliente</th>
-                            <th class="border px-4 py-2">Estado</th>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded shadow mb-8">
+                    <thead class="bg-pink-100 text-pink-700 uppercase text-sm leading-normal">
+                        <tr>
+                            <th class="py-3 px-6 text-left">Hora</th>
+                            <th class="py-3 px-6 text-left">Cliente</th>
+                            <th class="py-3 px-6 text-left">Servicio</th>
+                            <th class="py-3 px-6 text-left">Profesional</th>
+                            <th class="py-3 px-6 text-left">Estado</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="text-gray-700 text-sm">
                         @foreach ($listaTurnos as $turno)
-                            <tr>
-                                <td class="border px-4 py-2">{{ \Carbon\Carbon::parse($turno->hora)->format('H:i') }}</td>
-                                <td class="border px-4 py-2">{{ $turno->user->name }}</td>
-                                <td class="border px-4 py-2">{{ $turno->estado }}</td>
+                            <tr class="border-b border-gray-200 hover:bg-pink-50 transition">
+                                <td class="py-3 px-6 whitespace-nowrap">{{ \Carbon\Carbon::parse($turno->hora)->format('H:i') }}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">{{ $turno->user->name ?? 'Desconocido' }}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">{{ $turno->servicio->nombre ?? 'Sin servicio' }}</td>
+                                <td class="py-3 px-6 whitespace-nowrap">{{ $turno->profesional->name ?? 'No asignado' }}</td>
+                                <td class="py-3 px-6 whitespace-nowrap capitalize">{{ $turno->estado }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-            @endforeach
-        @endif
-
-    </div>
+            </div>
+        @endforeach
+    @endif
+</div>
 @endsection

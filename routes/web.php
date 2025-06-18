@@ -106,5 +106,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
+// Ruta para imprimir turnos por dia ADMIN
+Route::get('/admin/turnos/imprimir', [TurnosPorDiaController::class, 'imprimir'])->name('admin.turnos.imprimir');
 
 require __DIR__.'/auth.php';
