@@ -84,6 +84,28 @@
                             <th class="py-3 px-6 text-left">Servicio</th>
                             <th class="py-3 px-6 text-left">Profesional</th>
                             <th class="py-3 px-6 text-left">Estado</th>
+
+            <div>
+                <button type="submit" class="bg-pink-600 text-white px-4 py-2 rounded">Filtrar</button>
+            </div>
+
+            <div>
+                <button
+                    type="submit"
+                    name="exportar_pdf"
+                    value="1"
+                    class="bg-gray-700 text-white px-4 py-2 rounded"
+                >
+                    Exportar PDF
+                </button>
+            </div>
+        </form>
+
+        <!-- Mensaje de error -->
+        @if ($turnos->isEmpty())
+            <p class="text-lg">No hay turnos para esta fecha.</p>
+        @else
+
                         </tr>
                     </thead>
                     <tbody class="text-gray-700 text-sm">

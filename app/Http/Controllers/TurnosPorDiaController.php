@@ -19,6 +19,7 @@ class TurnosPorDiaController extends Controller
         $query = Turno::with(['user', 'servicio', 'profesional'])
             ->whereBetween('fecha', [Carbon::parse($fechaInicio), Carbon::parse($fechaFin)]);
 
+
         if ($request->filled('servicio_id')) {
             $query->where('servicio_id', $request->input('servicio_id'));
         }
@@ -99,3 +100,4 @@ class TurnosPorDiaController extends Controller
     }
 
 }
+

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Servicio;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 
 class ServiciosController extends Controller
@@ -88,7 +89,9 @@ public function destroy(Servicio $servicio)
 public function edit($id)
 {
     $servicio = Servicio::findOrFail($id);
-    return view('admin.servicios.edit', compact('servicio'));
+    $profesionales = User::role('profesional')->get();
+
+    return view('admin.servicios.edit', compact('servicio', 'profesionales'));
 }
 
 
@@ -103,6 +106,8 @@ public function update(Request $request, $id)
         'precio' => 'required|numeric|min:0',
         'descripcion' => 'nullable|string',
         'imagen' => 'nullable|image|max:2048',
+        'profesionales' => 'nullable|array',
+        'profesionales.*' => 'exists:users,id', // Asegura que cada ID exista
     ]);
 
     $servicio->nombre = $request->nombre;
@@ -116,6 +121,8 @@ public function update(Request $request, $id)
     }
 
     $servicio->save();
+    // Actualiza la relación muchos a muchos
+    $servicio->profesionales()->sync($request->input('profesionales', []));
 
     return redirect()->route('admin.servicios.index')->with('success', 'Servicio actualizado correctamente.');
 }

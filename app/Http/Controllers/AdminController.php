@@ -5,6 +5,7 @@ use App\Models\Servicio;
 use App\Models\Turno;
 
 use Illuminate\Http\Request;
+use PDF; // Si usas barryvdh/laravel-dompdf
 
 class AdminController extends Controller
 {

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ComprobantePago;
 use App\Http\Controllers\TurnoController;
 use App\Models\User;
+
 class ClienteTurnoController extends Controller
 {
     public function create()
