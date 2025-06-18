@@ -1,9 +1,6 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <a href="{{ route('dashboard') }}" class="inline-block bg-pink-400 text-white px-1 py-1 rounded hover:bg-pink-500 mb-4">
-        ← Volver a Inicio
-    </a>
 <div class="max-w-5xl mx-auto p-2 rounded-xl shadow-md">
 
 <div class="container mx-auto px-2 py-2">

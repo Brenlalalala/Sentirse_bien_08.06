@@ -131,7 +131,7 @@
             <div class="flex flex-col items-center mt-4 mb-6 px-4">
                 @if(Auth::user()->foto)
                     <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil"
-                        class="h-20 w-20 rounded-full object-cover border-2 border-pink-300 shadow-md">
+                        class="h-20 w-20 rounded-lg object-cover border-2 border-pink-300 shadow-md"
                 @else
                     <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300 shadow-md">
                         <svg class="h-8 w-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
@@ -179,6 +179,10 @@
                     </x-button-link>
 
                 @elseif (Auth::user()->hasRole('cliente'))
+                    <x-button-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        <x-lucide-home class="w-5 h-5" />
+                        Inicio
+                    </x-button-link>
                     <x-button-link :href="route('cliente.reservar-turno')" :active="request()->routeIs('cliente.reservar-turno')">
                         <x-lucide-calendar-plus class="w-5 h-5" />
                         Reservar Turno
