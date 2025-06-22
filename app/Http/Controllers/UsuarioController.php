@@ -51,7 +51,8 @@ class UsuarioController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required'
+            'role' => 'required|in:admin,cliente,profesional',
+            'password' => 'nullable|string|min:6',
         ]);
 
         $user->update([
@@ -59,14 +60,16 @@ class UsuarioController extends Controller
             'email' => $data['email'],
         ]);
 
-        if ($request->filled('password')) {
-            $user->update(['password' => bcrypt($request->password)]);
+        if (!empty($data['password'])) {
+            $user->update(['password' => bcrypt($data['password'])]);
         }
 
+        // ✅ Actualizar rol correctamente con Spatie
         $user->syncRoles([$data['role']]);
 
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado.');
     }
+
 
     public function destroy(User $user)
     {

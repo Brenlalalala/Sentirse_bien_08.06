@@ -17,36 +17,47 @@ class ClienteTurnoController extends Controller
 {
     public function create()
     {
-        $servicios = Servicio::all();
-        //Agregué profesionales para la vista de reserva de turno
-        $profesionales = User::where('role', 'profesional')->get(); 
-        return view('clientes.reservar-turno', compact('servicios', 'profesionales'));
+        // Carga los servicios con sus profesionales vinculados profesional_servicio
+        $servicios = Servicio::with('profesionales')->get();
+ 
+        return view('clientes.reservar-turno', compact('servicios'));
     }
 
     public function store(Request $request)
     {
         $serviciosSeleccionados = [];
 
-        // Filtrar solo los servicios seleccionados
         foreach ($request->input('servicios', []) as $servicio_id => $data) {
             if (isset($data['seleccionado']) && $data['seleccionado']) {
                 $serviciosSeleccionados[$servicio_id] = $data;
             }
         }
 
-        // Si no hay servicios seleccionados, redirigir con error
         if (empty($serviciosSeleccionados)) {
             return redirect()->back()->withErrors(['Debe seleccionar al menos un servicio.'])->withInput();
         }
 
-        // Validar solo los seleccionados
         foreach ($serviciosSeleccionados as $servicio_id => $data) {
+            // Validaciones por servicio
             $request->validate([
                 "servicios.$servicio_id.fecha" => 'required|date',
                 "servicios.$servicio_id.hora" => 'required|date_format:H:i',
-                //profesional_id es requerido y debe existir en la tabla users
                 "servicios.$servicio_id.profesional_id" => 'required|exists:users,id',
             ]);
+
+            $profesional = User::find($data['profesional_id']);
+            $servicio = Servicio::find($servicio_id);
+
+            if (!$servicio->profesionales->contains($profesional)) {
+                return redirect()->back()->withErrors(["El profesional seleccionado no está asignado a este servicio."])->withInput();
+            }
+
+            $disponibilidad = $this->esHorarioDisponible($data['profesional_id'], $servicio_id, $data['fecha'], $data['hora'], Auth::id());
+
+            if ($disponibilidad !== true) {
+                return redirect()->back()->withErrors([$disponibilidad])->withInput();
+            }
+
         }
 
         // Guardar los turnos
@@ -54,15 +65,23 @@ class ClienteTurnoController extends Controller
             Turno::create([
                 'user_id'       => Auth::id(),
                 'servicio_id'   => $servicio_id,
-                'profesional_id' => $data['profesional_id'],  // <--- nuevo
+                'profesional_id'=> $data['profesional_id'],
                 'fecha'         => $data['fecha'],
                 'hora'          => $data['hora'],
-                'metodo_pago'     => $request->input('metodo_pago'),
+                'metodo_pago'   => $request->input('metodo_pago'),
             ]);
         }
+            $metodo = $request->input('metodo_pago');
 
-        return redirect()->route('cliente.mis-servicios')->with('success', 'Reserva realizada con éxito.');
+            if (in_array($metodo, ['debito', 'credito'])) {
+                return redirect()->route('pago.formulario')->with('success', 'Turno reservado. Ahora realizá el pago.');
+            }
+
+            return redirect()->route('cliente.mis-servicios')->with('success', 'Turno reservado. El pago se encuentra pendiente y debe abonarse en el local.');
+
+
     }
+
 
 
     public function historial()
@@ -111,5 +130,31 @@ class ClienteTurnoController extends Controller
         return redirect()->route('cliente.mis-servicios')->with('error', 'No se puede cancelar este turno.');
     }
 
+    private function esHorarioDisponible($profesional_id, $servicio_id, $fecha, $hora, $cliente_id)
+{
+    // Verifica si el horario ya está reservado por el profesional
+    $ocupadoProfesional = Turno::where('profesional_id', $profesional_id)
+        ->where('fecha', $fecha)
+        ->where('hora', $hora)
+        ->where('estado', '!=', 'cancelado')
+        ->exists();
+
+    if ($ocupadoProfesional) {
+        return 'El profesional ya tiene un turno reservado en ese horario.';
+    }
+
+    // Verifica si el cliente ya tiene un turno en ese horario
+    $ocupadoCliente = Turno::where('user_id', $cliente_id)
+        ->where('fecha', $fecha)
+        ->where('hora', $hora)
+        ->where('estado', '!=', 'cancelado')
+        ->exists();
+
+    if ($ocupadoCliente) {
+        return 'Ya tenés un turno reservado en ese horario.';
+    }
+
+    return true;
+}
 
 }

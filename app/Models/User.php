@@ -18,7 +18,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',  // agregá role aquí
+        'role',  // roles
         'es_admin', // si usás este booleano también
         'celular',
     ];
@@ -63,6 +63,12 @@ public function pagos()
 public function servicios()
 {
     return $this->belongsToMany(Servicio::class, 'profesional_servicio', 'user_id', 'servicio_id');
+}
+
+///horarios disponibles de los profesionales
+public function horarios()
+{
+    return $this->hasMany(HorarioProfesional::class);
 }
 
 

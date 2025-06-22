@@ -55,39 +55,40 @@
                         <p class="text-base text-gray-700 font-medium leading-snug">{{ $servicio->descripcion }}</p>
                         <p class="text-lg font-bold text-rose-600">${{ number_format($servicio->precio, 2) }}</p>
 
-               {{-- Selector de profesional --}}
-            @if($servicio->profesionales->count() > 0)
-                <label class="block mb-1 text-pink-500 font-semibold" for="profesional_{{ $servicio->id }}">
-                    Seleccioná profesional {{ $servicio->name }}
-                </label>
-                <select 
-                    id="profesional_{{ $servicio->id }}" 
-                    name="servicios[{{ $servicio->id }}][profesional_id]" 
-                    class="border border-pink-300 rounded p-2 w-full mb-3"
-                >
-                    @foreach($servicio->profesionales as $profesional)
-                                <option value="{{ $profesional->id }}">
-                                    {{ $profesional->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    @else
-                        <p class="text-sm text-gray-400">No hay profesionales disponibles para este servicio.</p>
-                    @endif
+                        {{-- Selector de profesional --}}
+                        @if($servicio->profesionales->count() > 0)
+                            <label class="block mb-1 text-pink-500 font-semibold" for="profesional_{{ $servicio->id }}">
+                                Seleccioná profesional {{ $servicio->name }}
+                            </label>
+                                <select 
+                                    id="profesional_{{ $servicio->id }}" 
+                                    name="servicios[{{ $servicio->id }}][profesional_id]" 
+                                    class="border border-pink-300 rounded p-2 w-full mb-3"
+                                    data-servicio="{{ $servicio->id }}"
+                                >
+
+                                @foreach($servicio->profesionales as $profesional)
+                                    <option value="{{ $profesional->id }}">
+                                        {{ $profesional->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @else
+                            <p class="text-sm text-gray-400">No hay profesionales disponibles para este servicio.</p>
+                        @endif
 
                         <div class="space-y-2 mt-4">
                             <label class="block text-sm text-rose-700 font-semibold">Fecha (mínimo 48hs):</label>
-                            <input type="date" name="servicios[{{ $servicio->id }}][fecha]"
-                                class="w-full border border-rose-300 px-3 py-2 rounded focus:ring-rose-400 focus:border-rose-400"
-                                min="{{ \Carbon\Carbon::now()->addDays(2)->format('Y-m-d') }}">
+                                <input type="date" name="servicios[{{ $servicio->id }}][fecha]"
+                                    class="w-full border border-rose-300 px-3 py-2 rounded focus:ring-rose-400 focus:border-rose-400"
+                                    min="{{ \Carbon\Carbon::now()->addDays(2)->format('Y-m-d') }}"
+                                    data-servicio="{{ $servicio->id }}"
+                                />
 
-                            <label class="block text-sm text-rose-700 font-semibold mt-2">Hora (de 08 a 17hs):</label>
-                            <select name="servicios[{{ $servicio->id }}][hora]" class="w-full border border-rose-300 px-3 py-2 rounded focus:ring-rose-400 focus:border-rose-400">
-                                @for ($h = 8; $h <= 17; $h++)
-                                    <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00">
-                                        {{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00
-                                    </option>
-                                @endfor
+
+                            <label class="block text-sm text-rose-700 font-semibold mt-2">Hora (disponibles):</label>
+                            <select name="servicios[{{ $servicio->id }}][hora]" id="hora_{{ $servicio->id }}" class="w-full border border-rose-300 px-3 py-2 rounded focus:ring-rose-400 focus:border-rose-400">
+                                <option value="">Selecciona un profesional y fecha</option>
                             </select>
                         </div>
                     </div>
@@ -126,6 +127,49 @@
 </div>
 
 <script>
+    function cargarHorarios(servicioId) {
+        const profesionalSelect = document.getElementById(`profesional_${servicioId}`);
+        const fechaInput = document.querySelector(`input[name="servicios[${servicioId}][fecha]"]`);
+        const horaSelect = document.getElementById(`hora_${servicioId}`);
+
+        if (!profesionalSelect || !fechaInput || !horaSelect) return;
+
+        const profesionalId = profesionalSelect.value;
+        const fecha = fechaInput.value;
+
+        if (!profesionalId || !fecha) {
+            horaSelect.innerHTML = '<option value="">Selecciona un profesional y fecha</option>';
+            return;
+        }
+
+        horaSelect.innerHTML = '<option value="">Cargando...</option>';
+
+        fetch(`/horarios-disponibles?profesional_id=${profesionalId}&servicio_id=${servicioId}&fecha=${fecha}`)
+            .then(response => response.json())
+            .then(data => {
+                horaSelect.innerHTML = '';
+                if (!data.success || !data.horarios || data.horarios.length === 0) {
+                    horaSelect.innerHTML = '<option value="">No hay horarios disponibles</option>';
+                } else {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Selecciona un horario';
+                    horaSelect.appendChild(defaultOption);
+
+                    data.horarios.forEach(hora => {
+                        const option = document.createElement('option');
+                        option.value = hora.hora;
+                        option.textContent = hora.formatted;
+                        horaSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar horarios:', error);
+                horaSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
+            });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const checkboxes = document.querySelectorAll('input[type="checkbox"][name$="[seleccionado]"]');
         const contador = document.getElementById('contadorServicios');
@@ -171,6 +215,30 @@
         checkboxes.forEach(cb => cb.addEventListener('change', actualizarUI));
         document.querySelectorAll('input[type="date"], select').forEach(el => el.addEventListener('change', actualizarUI));
     });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const selectsProfesionales = document.querySelectorAll('select[id^="profesional_"]');
+    const inputsFecha = document.querySelectorAll('input[type="date"][name^="servicios["]');
+
+    selectsProfesionales.forEach(select => {
+        select.addEventListener('change', () => {
+            const servicioId = select.dataset.servicio;
+            if (servicioId) {
+                cargarHorarios(servicioId);
+            }
+        });
+    });
+
+    inputsFecha.forEach(input => {
+        input.addEventListener('change', () => {
+            const servicioId = input.dataset.servicio;
+            if (servicioId) {
+                cargarHorarios(servicioId);
+            }
+        });
+    });
+});
 </script>
 
 @endsection
