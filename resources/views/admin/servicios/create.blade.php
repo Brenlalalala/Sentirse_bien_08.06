@@ -23,6 +23,18 @@
         <input type="text" name="subcategoria" value="{{ old('subcategoria') }}" class="w-full border px-4 py-2 rounded" placeholder="Subcategoría" required>
         <input type="number" name="precio" step="0.01" min="0" value="{{ old('precio') }}" class="w-full border px-4 py-2 rounded" placeholder="Precio" required>
         <textarea name="descripcion" rows="4" class="w-full border px-4 py-2 rounded" placeholder="Descripción">{{ old('descripcion') }}</textarea>
+
+        {{-- Duración del servicio --}}
+        <div>
+            <label for="duracion" class="block mb-2 font-semibold text-gray-700">Duración</label>
+            <select name="duracion" id="duracion" class="w-full border px-4 py-2 rounded" required>
+                <option value="30" {{ old('duracion') == 30 ? 'selected' : '' }}>30 minutos</option>
+                <option value="60" {{ old('duracion', 60) == 60 ? 'selected' : '' }}>1 hora</option>
+                <option value="120" {{ old('duracion') == 120 ? 'selected' : '' }}>2 horas</option>
+                <option value="180" {{ old('duracion') == 180 ? 'selected' : '' }}>3 horas</option>
+            </select>
+        </div>
+
         <input type="file" name="imagen" class="w-full border px-4 py-2 rounded">
 
         <div class="flex justify-end gap-4">

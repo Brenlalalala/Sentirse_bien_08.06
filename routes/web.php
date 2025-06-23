@@ -13,7 +13,11 @@ use App\Http\Controllers\TurnosPorDiaController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfesionalController;
 use App\Http\Controllers\ClienteHistorialController;
+use App\Http\Controllers\ClientePagoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HorarioProfesionalController;
+use App\Http\Controllers\StripePaymentController;
+
 // Rutas públicas
 Route::get('/', fn() => view('home'))->name('home');
 Route::get('/conocenos', fn() => view('conocenos'))->name('conocenos');
@@ -121,6 +125,7 @@ Route::get('/admin/turnos/imprimir', [TurnosPorDiaController::class, 'imprimir']
 
 
 use App\Http\Controllers\UserController;
+use Database\Seeders\ClienteSeeder;
 
 Route::get('/admin/clientes', [UserController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -129,6 +134,20 @@ Route::get('/admin/clientes', [UserController::class, 'index'])
 Route::get('/admin/historial-cliente/{user}', [TurnoController::class, 'verHistorialCliente'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.historial.cliente');
+
+    //disponibilidad horaria de profesionales
+
+Route::get('/horarios-disponibles', [TurnoController::class, 'horariosDisponibles'])->name('horarios.disponibles');
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    Route::resource('/horarios', HorarioProfesionalController::class)->names('horarios');
+});
+
+//pago
+Route::get('/clientes/pagar', [ClientePagoController::class, 'mostrarFormulario'])->name('pago.formulario');
+Route::post('/clientes/pagar', [ClientePagoController::class, 'procesarPago'])->name('pago.procesar');
+
 
 
 require __DIR__.'/auth.php';

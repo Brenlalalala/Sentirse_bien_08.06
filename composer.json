@@ -12,7 +12,8 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "mallardduck/blade-lucide-icons": "^1.23",
-        "spatie/laravel-permission": "^6.19"
+        "spatie/laravel-permission": "^6.19",
+        "stripe/stripe-php": "^7.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

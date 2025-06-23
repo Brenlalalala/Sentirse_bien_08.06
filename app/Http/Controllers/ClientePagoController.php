@@ -3,25 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Stripe\Stripe;
+use Stripe\Charge;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ClientePagoController extends Controller
 {
-    public function formulario()
-    {
-        return view('cliente.PagoFormulario');
-    }
+public function mostrarFormulario()
+{
+    $monto = 5000; // centavos (ej: $50.00 USD)
+    return view('clientes.pagar', compact('monto'));
+}
 
-    public function procesar(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'tarjeta' => 'required|digits:16',
-            'fecha_exp' => 'required|string|max:5',
-            'cvv' => 'required|digits:3',
+
+public function procesar(Request $request)
+{
+    Stripe::setApiKey(config('services.stripe.secret'));
+
+    try {
+        $charge = Charge::create([
+            'amount' => $request->amount,
+            'currency' => 'usd',
+            'description' => 'Pago de servicio',
+            'source' => $request->token,
         ]);
 
-        // Simular procesamiento del pago...
+        // Enviar correo al cliente
+        Mail::to(auth()->user()->email)->send(new PagoExitosoMail($charge));
 
-        return redirect()->route('cliente.PagoFormulario')->with('success', 'Pago procesado correctamente.');
+        return response()->json(['success' => true]);
+
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
+}
+
 }

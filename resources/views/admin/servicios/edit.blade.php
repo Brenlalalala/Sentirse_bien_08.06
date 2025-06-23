@@ -25,13 +25,23 @@
         <input type="number" name="precio" step="0.01" min="0" value="{{ old('precio', $servicio->precio) }}" class="w-full border px-4 py-2 rounded" placeholder="Precio" required>
         <textarea name="descripcion" rows="4" class="w-full border px-4 py-2 rounded" placeholder="Descripción">{{ old('descripcion', $servicio->descripcion) }}</textarea>
 
+        {{-- Duración del servicio --}}
+        <div>
+            <label for="duracion" class="block mb-2 font-semibold text-gray-700">Duración</label>
+            <select name="duracion" id="duracion" class="w-full border px-4 py-2 rounded" required>
+                <option value="30" {{ old('duracion', $servicio->duracion) == 30 ? 'selected' : '' }}>30 minutos</option>
+                <option value="60" {{ old('duracion', $servicio->duracion) == 60 ? 'selected' : '' }}>1 hora</option>
+                <option value="120" {{ old('duracion', $servicio->duracion) == 120 ? 'selected' : '' }}>2 horas</option>
+                <option value="180" {{ old('duracion', $servicio->duracion) == 180 ? 'selected' : '' }}>3 horas</option>
+            </select>
+        </div>
+
         <div>
             <label for="profesionales" class="block text-gray-700 font-semibold mb-2">Asignar Profesionales:</label>
             <select 
                 name="profesionales[]"
                 multiple
                 id="profesionales" 
-                multiple 
                 class="w-full border px-4 py-2 rounded bg-white text-gray-700"
             >
                 @foreach($profesionales as $profesional)
@@ -46,8 +56,6 @@
             <small class="text-gray-500 italic">Usá Ctrl (Windows) o Cmd (Mac) para seleccionar múltiples.</small>
         </div>
 
-        
-        
         <div>
             <label class="block mb-2 text-gray-700">Imagen actual:</label>
             @if($servicio->imagen)
