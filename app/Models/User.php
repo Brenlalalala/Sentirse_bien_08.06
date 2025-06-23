@@ -47,7 +47,8 @@ class User extends Authenticatable
 
     public function isProfesional()
     {
-        return $this->role === 'profesional';
+        //return $this->role === 'profesional';
+        return $this->hasRole('profesional');
     }
 
     public function turnos() {

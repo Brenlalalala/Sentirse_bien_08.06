@@ -85,12 +85,22 @@ Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->
 
 
 // Rutas para PROFESIONAL (sin prefijo, solo rol profesional)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profesional/turnos-dia', [ProfesionalController::class, 'turnosDelDia'])->name('profesional.turnos.dia');
-    Route::post('/profesional/agregar-historial', [ProfesionalController::class, 'agregarHistorial'])->name('profesional.historial.agregar');
-    Route::get('/profesional/historial/{id}', [ProfesionalController::class, 'verHistorial'])->name('profesional.historial.ver');
+// Route::middleware(['auth'])->group(function () {
+//     Route::get('/profesional/turnos-dia', [ProfesionalController::class, 'turnosDelDia'])->name('profesional.turnos.dia');
+//     Route::post('/profesional/agregar-historial', [ProfesionalController::class, 'agregarHistorial'])->name('profesional.historial.agregar');
+ //Route::get('/profesional/historial/{id}', [ProfesionalController::class, 'verHistorial'])->name('profesional.historial.ver');
+// });
+   Route::middleware(['auth', 'role:profesional'])->group(function () {
+    Route::get('/profesional/turnos', [ProfesionalController::class, 'verTurnos'])->name('profesional.turnos');
+    Route::get('/profesional/turnos/pdf', [ProfesionalController::class, 'exportarTurnosPdf'])->name('profesional.turnos.pdf');
+    Route::get('/profesional/historial', [ProfesionalController::class, 'verHistorial'])->name('profesional.historial.ver');
+    Route::post('/profesional/historial/agregar', [ProfesionalController::class, 'agregarHistorial'])->name('profesional.historial.agregar');
+
 });
 
+
+
+   
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->name('cliente.historial');
