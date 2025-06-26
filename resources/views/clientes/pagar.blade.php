@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-<!-- Mantén estilos y scripts que usabas para Card.js si quieres la animación visual -->
+<!-- Estilos y scripts de Card.js -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/card@2.5.4/dist/card.css">
 <script src="https://cdn.jsdelivr.net/npm/card@2.5.4/dist/card.min.js"></script>
 
@@ -16,18 +16,34 @@
     </div>
 @endif
 
-<style>
-/* Tus estilos personalizados para inputs, botones, etc. */
-</style>
-
 <div class="form-container">
-    <h2 class="text-xl font-bold mb-4">Pagar con tarjeta</h2>
+    <h2 class="text-xl font-bold mb-4 text-pink-600">Pagar con tarjeta</h2>
+
+    {{-- Resumen de servicios --}}
+    <h3 class="text-lg font-semibold mb-4">Resumen de servicios para el {{ \Carbon\Carbon::parse($fechaGrupo)->format('d/m/Y') }}</h3>
+    <ul class="mb-6 space-y-2">
+        @foreach ($turnos as $turnoJson)
+            @php $turno = json_decode($turnoJson, true); @endphp
+            <li class="border border-pink-200 rounded p-3 text-sm">
+                <strong>Servicio ID:</strong> {{ $turno['servicio_id'] }} —
+                <strong>Hora:</strong> {{ $turno['hora'] }} —
+                <strong>Profesional ID:</strong> {{ $turno['profesional_id'] }}
+            </li>
+        @endforeach
+    </ul>
 
     <form id="payment-form" method="POST" action="{{ route('pago.procesar') }}">
         @csrf
+
+        {{-- Campos ocultos para turnos y método de pago --}}
+        @foreach ($turnos as $turno)
+            <input type="hidden" name="turnos[]" value="{{ $turno }}">
+        @endforeach
+        <input type="hidden" name="metodo_pago" value="{{ $metodo }}">
+
         <div id="card-wrapper" class="mb-4"></div>
 
-        <div class="flex flex-col items-center space-y-3"> 
+        <div class="flex flex-col items-center space-y-3">
             <input type="text" name="number" placeholder="Número de tarjeta" required
                 class="w-80 px-4 py-2 rounded-md text-gray border border-gray-300">
 
@@ -56,7 +72,8 @@
         </div>
 
         <div class="flex justify-center mt-6">
-            <button type="submit" id="submit-button" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+            <button type="submit" id="submit-button"
+                class="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
                 Pagar
             </button>
         </div>
@@ -93,23 +110,17 @@ form.addEventListener('submit', function(e) {
     loading.style.display = 'block';
     submitButton.disabled = true;
 
-    // Simulamos un delay para parecer real
     setTimeout(() => {
         loading.style.display = 'none';
 
-        // Aquí enviar el formulario realmente al backend (si quieres hacerlo por JS, descomenta)
-        // form.submit();
-
-        // O simulamos que fue exitoso y mostramos mensaje:
+        // Simular éxito y mostrar mensaje
         form.style.display = 'none';
         successMessage.style.display = 'block';
 
-        // Redirige luego de 2.5 segundos
         setTimeout(() => {
             window.location.href = "{{ route('cliente.mis-servicios') }}";
         }, 2500);
-
-    }, 1500); // 1.5 segundos de "procesando"
+    }, 1500);
 });
 </script>
 @endsection

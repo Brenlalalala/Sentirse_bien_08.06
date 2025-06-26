@@ -171,6 +171,15 @@
                         <x-lucide-history class="w-5 h-5" />
                         Horarios de profesionales
                     </x-button-link>
+                    <x-button-link :href="route('pagos.por-servicio')" :active="request()->routeIs('pagos.por-servicio')">
+                    <x-lucide-credit-card class="w-5 h-5" />
+                    Pagos por Servicio
+                </x-button-link>
+
+                <x-button-link :href="route('pagos.por-profesional')" :active="request()->routeIs('pagos.por-profesional')">
+                    <x-lucide-user-check class="w-5 h-5" />
+                    Pagos por Profesional
+                </x-button-link>
 
 
                 @elseif (Auth::user()->isProfesional())
@@ -196,6 +205,10 @@
                     <x-button-link :href="route('cliente.mis-servicios')" :active="request()->routeIs('cliente.mis-servicios')">
                         <x-lucide-heart class="w-5 h-5" />
                         Mis Servicios
+                    </x-button-link>
+                    <x-button-link :href="route('cliente.pagos.mis-pagos')" :active="request()->routeIs('cliente.pagos.mis-pagos')">
+                        <x-lucide-wallet class="w-5 h-5" />
+                        Mis Pagos
                     </x-button-link>
                     <x-button-link :href="route('cliente.historial')" :active="request()->routeIs('cliente.historial')">
                         <x-lucide-history class="w-5 h-5" />

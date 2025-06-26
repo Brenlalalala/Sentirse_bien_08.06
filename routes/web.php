@@ -17,6 +17,10 @@ use App\Http\Controllers\ClientePagoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HorarioProfesionalController;
 use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\PagoController;
+
+use App\Http\Controllers\UserController;
+use Database\Seeders\ClienteSeeder;
 
 // Rutas públicas
 Route::get('/', fn() => view('home'))->name('home');
@@ -102,14 +106,9 @@ Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->
 
 });
 
-
-
-   
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/cliente/historial', [ClienteTurnoController::class, 'historial'])->name('cliente.historial');
 });
-
 
 
 //chatbot
@@ -123,9 +122,6 @@ Route::get('/dashboard', function () {
 // Ruta para imprimir turnos por dia ADMIN
 Route::get('/admin/turnos/imprimir', [TurnosPorDiaController::class, 'imprimir'])->name('admin.turnos.imprimir');
 
-
-use App\Http\Controllers\UserController;
-use Database\Seeders\ClienteSeeder;
 
 Route::get('/admin/clientes', [UserController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -144,10 +140,29 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('/horarios', HorarioProfesionalController::class)->names('horarios');
 });
 
-//pago
-Route::get('/clientes/pagar', [ClientePagoController::class, 'mostrarFormulario'])->name('pago.formulario');
-Route::post('/clientes/pagar', [ClientePagoController::class, 'procesarPago'])->name('pago.procesar');
+// //pago
+// Route::get('/clientes/pagar', [ClientePagoController::class, 'mostrarFormulario'])->name('pago.formulario');
+// Route::post('/clientes/pagar', [ClientePagoController::class, 'procesarPago'])->name('pago.procesar');
 
+
+
+// Procesar reservas
+Route::post('/cliente/turnos/store', [ClienteTurnoController::class, 'store'])->name('cliente.turnos.store');
+
+// Simulación de pago con tarjeta
+Route::get('/cliente/pago-tarjeta', [ClienteTurnoController::class, 'vistaPagoTarjeta'])->name('cliente.pago.tarjeta');
+
+// Simular procesamiento (solo botón "Pagar")
+Route::post('/cliente/pago-tarjeta/procesar', [ClienteTurnoController::class, 'procesarPagoTarjeta'])->name('cliente.pago.tarjeta.procesar');
+
+
+
+//listado de pagos
+Route::middleware(['auth'])->group(function () {
+ Route::get('/pagos/por-servicio', [PagoController::class, 'porServicio'])->name('pagos.por-servicio');
+ Route::get('/pagos/por-profesional', [PagoController::class, 'porProfesional'])->name('pagos.por-profesional');
+Route::get('/cliente/mis-pagos', [PagoController::class, 'misPagos'])->name('cliente.pagos.mis-pagos');
+});
 
 
 require __DIR__.'/auth.php';
