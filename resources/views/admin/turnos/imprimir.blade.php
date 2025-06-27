@@ -93,7 +93,8 @@
 </head>
 <body>
     <header>
-        <img src="{{ public_path('imagenes/logo.png') }}" alt="Logo" class="logo">
+       <img src="{{ asset('imagenes/logo.png') }}" alt="Logo Sentirse Bien" class="logo">
+
         <h2>Listado de Turnos</h2>
         <p class="fecha">Fecha de generación: {{ now()->format('d/m/Y H:i') }}</p>
         <p style="margin: 5px 0 2px; font-weight: bold;">Filtros aplicados:</p>

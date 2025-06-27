@@ -73,7 +73,6 @@
             * Si abonás con tarjeta de débito 48 hs antes, se aplica el 15% de descuento en la validación del pago.
         </p>
     </div>
-    
 
     <div class="text-right mt-8">
         <button type="submit"
