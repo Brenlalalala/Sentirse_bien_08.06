@@ -2,68 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PagoExitosoMail;
 use Illuminate\Http\Request;
-use Stripe\Stripe;
-use Stripe\Charge;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Session;
-use App\Models\Turno;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Pago;
 use App\Models\Servicio;
+use App\Models\Turno;
 use Carbon\Carbon;
-use App\Mail\PagoExitosoMail;
-// use PDF; // Descomenta si usás Dompdf para PDF adjunto
-use App\Mail\ComprobantePago;
 use Illuminate\Support\Facades\Log;
-
 
 class ClientePagoController extends Controller
 {
-    public function mostrarFormulario()
-    {
-        $monto = 5000; // centavos (ej: $50.00 USD)
-        return view('clientes.pagar', compact('monto'));
-    }
-
-    // public function procesar(Request $request)
-    // {
-    //     Stripe::setApiKey(config('services.stripe.secret'));
-
-    //     try {
-    //         $charge = Charge::create([
-    //             'amount' => $request->amount,
-    //             'currency' => 'usd',
-    //             'description' => 'Pago de servicio',
-    //             'source' => $request->token,
-    //         ]);
-
-    //         // Enviar correo al cliente
-    //         Mail::to(auth()->user()->email)->send(new PagoExitosoMail($charge));
-
-    //         return response()->json(['success' => true]);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json(['success' => false, 'message' => $e->getMessage()]);
-    //     }
-    // }
-
-
     public function procesarPago(Request $request)
     {
+        // Validación de entrada
         $request->validate([
             'metodo_pago' => 'required|in:efectivo,debito,credito',
             'turnos' => 'required|array',
         ]);
 
+        // Obtener el usuario autenticado
         $user = Auth::user();
         $metodo = $request->input('metodo_pago');
         $turnos = $request->input('turnos');
 
+        // Inicializar variables
         $montoTotal = 0;
         $descuento = 0;
         $turnosDetalle = [];
 
+        // Procesar cada turno
         foreach ($turnos as $turnoJson) {
             $turno = json_decode($turnoJson, true);
             $servicio = Servicio::find($turno['servicio_id']);
@@ -74,13 +44,16 @@ class ClientePagoController extends Controller
 
             $precioFinal = $precio;
 
+            // Aplicar descuento si el pago es con débito y la diferencia con la fecha es mayor a 48 horas
             if ($metodo === 'debito' && $hoy->diffInHours($fecha, false) >= 48) {
                 $precioFinal *= 0.85;
                 $descuento = 0.15;
             }
 
+            // Acumular el monto total
             $montoTotal += $precioFinal;
 
+            // Detalles de los turnos
             $turnosDetalle[] = [
                 'servicio' => $servicio->nombre ?? 'Servicio',
                 'fecha' => $turno['fecha'],
@@ -90,6 +63,7 @@ class ClientePagoController extends Controller
             ];
         }
 
+        // Crear el registro de pago
         $pago = Pago::create([
             'user_id' => $user->id,
             'monto' => $montoTotal,
@@ -98,6 +72,7 @@ class ClientePagoController extends Controller
             'fecha_pago' => now(),
         ]);
 
+        // Crear los turnos en la base de datos
         foreach ($turnos as $turnoJson) {
             $turno = json_decode($turnoJson, true);
 
@@ -112,114 +87,35 @@ class ClientePagoController extends Controller
             ]);
         }
 
-        // 🚨 Asegurate que la clase ComprobantePago extienda Mailable y tenga bien configurada la vista.
+        // Cargar los turnos recién creados
+        $turnosCreados = Turno::where('pago_id', $pago->id)->with(['servicio', 'profesional'])->get();
+
+        // Generar el PDF con los datos del comprobante de pago
+        $pdf = PDF::loadView('pdf.comprobante_pago', [
+            'pago' => $pago,
+            'turnos' => $turnosCreados,
+            'nombre' => $user->name,
+        ])->output();
+
         try {
-            Mail::to($user->email)->send(new PagoExitosoMail($pago, $turnos, $user->name));
+            // Enviar el correo con los datos y el PDF adjunto
+            Mail::to($user->email)->send(new PagoExitosoMail(
+                $user->name,  // nombre_cliente
+                $turnosDetalle[0]['servicio'] ?? null,  // servicio
+                $turnosCreados[0]->profesional->nombre ?? null,  // profesional
+                $pago->fecha_pago->format('d/m/Y') ?? null,  // fecha_pago
+                $turnosCreados[0]->fecha . ' a las ' . $turnosCreados[0]->hora ?? null,  // turno
+                $pago->monto ?? null,  // monto
+                $pdf  // pdf
+            ));
+
         } catch (\Exception $e) {
+            // Loguear cualquier error
             Log::error('Error al enviar el comprobante de pago: ' . $e->getMessage());
             return redirect()->route('cliente.mis-servicios')->with('warning', 'Turnos reservados, pero hubo un error al enviar el comprobante por correo.');
         }
 
-        if (Session::has('grupo2')) {
-            return redirect()->route('cliente.pagar.segundo-grupo')->with('success', 'Primer turno pagado. Ahora elige cómo abonar el siguiente.');
-        }
-
+        // Redirigir con mensaje de éxito
         return redirect()->route('cliente.mis-servicios')->with('success', '¡Turnos reservados con éxito! Se ha enviado el comprobante a tu correo.');
-    }
-
-    public function mostrarSegundoGrupo()
-    {
-        if (!Session::has('grupo2')) {
-            return redirect()->route('cliente.mis-servicios');
-        }
-
-        $grupo2 = Session::get('grupo2');
-
-        return view('clientes.pago-segundo-grupo', compact('grupo2'));
-    }
-
-    public function procesarPagoSegundoGrupo(Request $request)
-    {
-        $request->validate([
-            'metodo_pago' => 'required|in:efectivo,debito,credito',
-            'turnos' => 'required|array',
-        ]);
-
-        $userId = Auth::id();
-        $metodo = $request->input('metodo_pago');
-        $turnos = $request->input('turnos');
-
-        $montoTotal = 0;
-        $descuento = 0;
-
-        foreach ($turnos as $turnoJson) {
-            $turno = json_decode($turnoJson, true);
-            $servicio = Servicio::find($turno['servicio_id']);
-            $precio = $servicio?->precio ?? 0;
-
-            $fecha = Carbon::parse($turno['fecha']);
-            $hoy = Carbon::now();
-
-            $precioFinal = $precio;
-
-            if ($metodo === 'debito' && $hoy->diffInHours($fecha, false) >= 48) {
-                $precioFinal *= 0.85;
-                $descuento = 0.15;
-            }
-
-            $montoTotal += $precioFinal;
-        }
-
-        $pago = Pago::create([
-            'user_id' => $userId,
-            'monto' => $montoTotal,
-            'descuento' => $descuento,
-            'forma_pago' => $metodo,
-            'fecha_pago' => now(),
-        ]);
-
-        $turnosCreados = [];
-
-        foreach ($turnos as $turnoJson) {
-            $turno = json_decode($turnoJson, true);
-
-            $nuevoTurno = Turno::create([
-                'user_id' => $userId,
-                'servicio_id' => $turno['servicio_id'],
-                'profesional_id' => $turno['profesional_id'],
-                'fecha' => $turno['fecha'],
-                'hora' => $turno['hora'],
-                'metodo_pago' => $metodo,
-                'pago_id' => $pago->id,
-            ]);
-
-            $turnosCreados[] = $nuevoTurno;
-        }
-
-        // Cargar relaciones para el mail
-        $turnosConRelacion = collect($turnosCreados)->load(['servicio', 'profesional']);
-
-        // Opcional: generar PDF y adjuntar
-        // $pdf = PDF::loadView('pdf.comprobante_pago', [
-        //     'pago' => $pago,
-        //     'turnos' => $turnosConRelacion,
-        // ]);
-
-        // Enviar mail al usuario
-        $user = Auth::user();
-
-        try {
-            Mail::to($user->email)
-                ->send(new PagoExitosoMail($pago, $turnosConRelacion, $user->name));
-        } catch (\Exception $e) {
-            logger()->error("Error al enviar el mail: " . $e->getMessage());
-            return back()->with('error', 'Ocurrió un error al enviar el mail. Por favor, contactá al administrador.');
-        }
-
-
-
-        Session::forget(['grupo1', 'grupo2', 'metodo_pago']);
-
-        return redirect()->route('cliente.mis-servicios')->with('success', '¡Todos los turnos fueron reservados y pagados! 💖');
     }
 }

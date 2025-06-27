@@ -2,24 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Confirmación de Pago - Spa Belleza</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #fff0f6; color: #333; }
-        h1 { color: #e91e63; }
-        p { font-size: 16px; }
-        .footer { margin-top: 30px; font-size: 12px; color: #999; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante de Pago Exitoso</title>
 </head>
 <body>
-    <h1>¡Gracias por tu pago!</h1>
-    <p>Hola {{ $nombre }},</p>
-    <p>Hemos recibido correctamente el pago de <strong>${{ number_format($pago->monto, 2) }}</strong> mediante <strong>{{ ucfirst($pago->forma_pago) }}</strong>.</p>
-    <p>Adjuntamos el comprobante con los detalles de tus turnos reservados.</p>
+    <h1>¡Gracias por tu pago, {{ $nombre_cliente }}!</h1>
 
-    <p>Esperamos verte pronto en nuestro Spa de Belleza 💖</p>
+<p>Tu pago ha sido procesado correctamente y tu reserva está confirmada.</p>
 
-    <div class="footer">
-        <p>Spa Belleza - Tu bienestar, nuestra prioridad.</p>
-    </div>
+<p>Para descargar el comprobante de pago, por favor visita la sección <strong><a href="http://tusitio.com/mis-servicios">Mis Servicios</a></strong> en nuestro sitio web.</p>
+
+<p><strong>Servicio:</strong> {{ $servicio }}</p>
+<p><strong>Profesional:</strong> {{ $profesional }}</p>
+<p><strong>Fecha del pago:</strong> {{ $fecha_pago }}</p>
+<p><strong>Turno reservado:</strong> {{ $turno }}</p>
+<p><strong>Monto abonado:</strong> {{ $monto }}</p>
+
+<p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+
+<p>¡Gracias por elegirnos!</p>
 </body>
 </html>

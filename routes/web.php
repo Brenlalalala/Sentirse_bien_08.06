@@ -141,9 +141,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 // //pago
-// Route::get('/clientes/pagar', [ClientePagoController::class, 'mostrarFormulario'])->name('pago.formulario');
-// Route::post('/clientes/pagar', [ClientePagoController::class, 'procesarPago'])->name('pago.procesar');
+ Route::get('/clientes/pagar', [ClientePagoController::class, 'mostrarFormulario'])->name('pago.formulario');
+ Route::post('/clientes/pagar', [ClientePagoController::class, 'procesarPago'])->name('pago.procesar');
 
+// Mostrar formulario de pago del segundo grupo (si se usa Sesión con 'grupo2')
+Route::get('/cliente/pagar/segundo-grupo', [ClientePagoController::class, 'mostrarSegundoGrupo'])->name('cliente.pagar.segundo-grupo');
+
+// Procesar el pago del segundo grupo
+Route::post('/cliente/pagar/segundo-grupo', [ClientePagoController::class, 'procesarPagoSegundoGrupo'])->name('cliente.pagar.segundo-grupo.procesar');
 
 
 // Procesar reservas
@@ -166,5 +171,9 @@ Route::get('/pagos/exportar/profesionales', [PagoController::class, 'exportarPag
 Route::get('/pagos/exportar/servicios', [PagoController::class, 'exportarPagosPorServicio'])->name('pagos.exportar.servicios');
 
 });
+
+// Ruta para generar y descargar el comprobante de pago
+    Route::get('/mis-servicios/comprobante/{pago}', [App\Http\Controllers\ClientePagoController::class, 'descargarComprobante'])->name('cliente.descargar.comprobante');
+
 
 require __DIR__.'/auth.php';
