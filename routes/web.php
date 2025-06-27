@@ -162,6 +162,9 @@ Route::middleware(['auth'])->group(function () {
  Route::get('/pagos/por-servicio', [PagoController::class, 'porServicio'])->name('pagos.por-servicio');
  Route::get('/pagos/por-profesional', [PagoController::class, 'porProfesional'])->name('pagos.por-profesional');
 Route::get('/cliente/mis-pagos', [PagoController::class, 'misPagos'])->name('cliente.pagos.mis-pagos');
+Route::get('/pagos/exportar/profesionales', [PagoController::class, 'exportarPagosPorProfesional'])->name('pagos.exportar.profesionales');
+Route::get('/pagos/exportar/servicios', [PagoController::class, 'exportarPagosPorServicio'])->name('pagos.exportar.servicios');
+
 });
 
 

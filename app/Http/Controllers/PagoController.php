@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pago;
+use App\Models\User;
+use App\Models\Servicio;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PagoController extends Controller
 {
@@ -69,5 +73,40 @@ class PagoController extends Controller
 
         return view('clientes.mis-pagos', compact('pagos'));
     }
+
+
+    public function exportarPagosPorProfesional(Request $request)
+{
+    $desde = $request->input('desde');
+    $hasta = $request->input('hasta');
+
+    $pagos = Pago::with(['user', 'turnos.servicio'])
+        ->whereBetween('fecha_pago', [$desde, $hasta])
+        ->get()
+        ->groupBy(function ($pago) {
+            return $pago->turnos->first()?->profesional->name ?? 'Sin Profesional';
+        });
+
+    $pdf = PDF::loadView('pagos.imprimir_prof', compact('pagos', 'desde', 'hasta'));
+    return $pdf->download('pagos_por_profesional.pdf');
+}
+
+public function exportarPagosPorServicio(Request $request)
+{
+    $desde = $request->input('desde');
+    $hasta = $request->input('hasta');
+
+    $pagos = Pago::with(['user', 'turnos.servicio'])
+        ->whereBetween('fecha_pago', [$desde, $hasta])
+        ->get()
+        ->groupBy(function ($pago) {
+            return $pago->turnos->first()?->servicio->nombre ?? 'Sin Servicio';
+        });
+
+    $pdf = Pdf::loadView('pagos.imprimir_scio', compact('pagos', 'desde', 'hasta'));
+    return $pdf->download('pagos_por_servicio.pdf');
+}
+
+
 }
 
