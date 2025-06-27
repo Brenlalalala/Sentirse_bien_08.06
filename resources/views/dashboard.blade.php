@@ -28,25 +28,27 @@
     @role('cliente')
         {{-- Nota con descuento --}}
         <div class="relative mt-6 p-4 bg-green-200 text-green-900 rounded-md shadow-lg postit-anim animate-slide-in-left" 
-             style="clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%); width: 320px;">
-            <div class="flex items-start gap-3">
-                <svg class="w-6 h-6 text-green-700 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12h2V8H9v4zm0 4h2v-2H9v2zm1-16C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0z"/>
-                </svg>
-                <div>
-                    <p class="font-bold text-lg mb-1">🎉 ¡Descuento exclusivo!</p>
-                    <p class="text-sm leading-relaxed">
-                        💳 Si el pago se realiza por la <strong>web</strong> antes de las <strong>48 hs</strong> del servicio 🕒,<br>
-                        obtenés un <strong>15% de descuento</strong> 💸.<br>
-                        Solo se puede pagar con <strong>tarjeta de débito</strong> 😃 .<br>
-                        Caso contrario, se abona el <strong>precio de lista</strong> 🛒.
-                    </p>
-                </div>
-            </div>
+        style="clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%); width: 320px;">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-green-700 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12h2V8H9v4zm0 4h2v-2H9v2zm1-16C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0z"/>
+            </svg>
+            <div>
+               <p class="font-extrabold text-2xl mb-1 whitespace-nowrap">🎉 ¡Descuento exclusivo!</p>
 
-            <!-- Esquina doblada -->
-            <div class="absolute bottom-0 right-0 w-0 h-0 border-b-[20px] border-l-[20px] border-b-white border-l-green-300"></div>
+                <p class="text-base leading-relaxed">
+                    💳 Si el pago se realiza por la <strong>web</strong> antes de las <strong>48 hs</strong> del servicio 🕒<br>
+                    obtenés un <strong>15% de descuento</strong> 💸<br>
+                    Solo se puede pagar con <strong>tarjeta de débito</strong> 😃 <br>
+                    Caso contrario, se abona el <strong>precio de lista</strong> 🛒
+                </p>
+            </div>
         </div>
+
+    <!-- Esquina doblada -->
+    <div class="absolute bottom-0 right-0 w-0 h-0 border-b-[20px] border-l-[20px] border-b-white border-l-green-300"></div>
+</div>
+
     @endrole
 
     <style>
