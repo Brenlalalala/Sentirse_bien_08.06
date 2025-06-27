@@ -42,12 +42,11 @@
                         <!-- Nueva celda con el botón para descargar el comprobante de pago -->
                         <td class="p-3 border">
                             @if($turno->pago)
-                                <a href="{{ route('cliente.descargar.comprobante', $turno->pago) }}" class="inline-flex items-center px-4 py-2 bg-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200">
-                                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8l-8 8-8-8"/>
+        <a href="{{ route('cliente.descargar.comprobante', $turno->id) }}" class="inline-flex items-center px-4 py-2 bg-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200">                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8l-8 8-8-8"/>
                                     </svg>
                                     Descargar
                                 </a>
+
                             @else
                                 <span class="text-gray-400">No disponible</span>
                             @endif

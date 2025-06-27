@@ -172,8 +172,8 @@ Route::get('/pagos/exportar/servicios', [PagoController::class, 'exportarPagosPo
 
 });
 
-// Ruta para generar y descargar el comprobante de pago
-    Route::get('/mis-servicios/comprobante/{pago}', [App\Http\Controllers\ClientePagoController::class, 'descargarComprobante'])->name('cliente.descargar.comprobante');
+// Ruta para generar el comprobante completo (pago + turno)
+Route::get('cliente/descargar/comprobante/{turnoId}', [ClientePagoController::class, 'generarComprobante'])->name('cliente.descargar.comprobante');
 
 
 require __DIR__.'/auth.php';
