@@ -164,5 +164,4 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/cliente/mis-pagos', [PagoController::class, 'misPagos'])->name('cliente.pagos.mis-pagos');
 });
 
-
 require __DIR__.'/auth.php';

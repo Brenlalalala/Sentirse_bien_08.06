@@ -130,7 +130,7 @@
 <!-- Foto de perfil y nombre del usuario -->
 <div class="flex flex-col items-center mt-4 mb-6 px-4">
         @if(Auth::check() && Auth::user()->foto)
-            <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil" class="h-10 w-10 rounded-full object-cover">
+            <img src="{{ asset('storage/' . Auth::user()->foto) }}" alt="Foto de perfil" class="h-24 w-24 rounded-lg object-cover shadow-md">
         @else
             <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                 <svg class="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">

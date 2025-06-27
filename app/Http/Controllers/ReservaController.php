@@ -30,7 +30,7 @@ class ReservaController extends Controller
         }
         
         Turno::create([
-            'user_id' => Auth::id(), // 👈 Este es el que faltaba
+            'user_id' => Auth::id(), 
             'servicio_id' => $request->servicio_id,
             'fecha' => $request->fecha,
             'hora' => $request->hora,
